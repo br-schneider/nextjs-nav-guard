@@ -266,7 +266,20 @@ test.describe("Navigation Guard - App Router", () => {
     ).toBeChecked();
   });
 
-  test("should guard tab close/navigation away", async ({ page }) => {
+  test("should guard tab close/navigation away", async ({
+    page,
+    browserName,
+  }) => {
+    // WebKit 26+ no longer surfaces the beforeunload prompt for scripted,
+    // non-user-gesture navigations under automation (page.goto / location.href),
+    // so this synthetic check can't run there. Real tab-close/address-bar
+    // beforeunload guarding still works, and the in-app guard is covered by the
+    // other tests on all engines, including WebKit.
+    test.skip(
+      browserName === "webkit",
+      "WebKit suppresses beforeunload for scripted navigation under automation"
+    );
+
     await page.goto("/page1");
 
     await page
