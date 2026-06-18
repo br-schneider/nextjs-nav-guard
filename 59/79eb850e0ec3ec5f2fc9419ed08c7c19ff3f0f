@@ -1,0 +1,26 @@
+example/package.json
+  s_9ded538e2297f4::t_f46c1c03eedc67 12
+website/package.json
+  s_9ded538e2297f4::t_f46c1c03eedc67 13-14,17-19
+package.json
+  s_9ded538e2297f4::t_f46c1c03eedc67 53,57-70
+  s_9ded538e2297f4::t_005503139c580e 50,54
+e2e/navigation-guard.spec.ts
+  s_9ded538e2297f4::t_6d2bbea0befa2d 269-282
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "5979eb850e0ec3ec5f2fc9419ed08c7c19ff3f0f",
+  "prompts": {},
+  "sessions": {
+    "s_9ded538e2297f4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d270673b-9450-47ae-8a3d-13f29f70c74d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Brett Schneider <brett.c.schneider@gmail.com>"
+    }
+  }
+}
