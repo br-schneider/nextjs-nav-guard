@@ -1,16 +1,12 @@
+import build from "@hono/vite-build/vercel";
 import devServer from "@hono/vite-dev-server";
 import { defineConfig } from "vite";
 
-export default defineConfig(({ mode }) => {
-  if (mode === "production") {
-    return {
-      build: {
-        ssr: "src/index.tsx",
-        outDir: "dist",
-      },
-    };
-  }
-  return {
-    plugins: [devServer({ entry: "src/index.tsx" })],
-  };
+// Dev: Hono runs inside Vite's dev server.
+// Build: emit a Vercel serverless function via the Build Output API (.vercel/output).
+export default defineConfig({
+  plugins: [
+    devServer({ entry: "src/index.tsx" }),
+    build({ entry: "src/index.tsx" }),
+  ],
 });

@@ -11,3 +11,8 @@ node_modules
 # Website
 website/dist/
 website/node_modules/
+website/.vercel/
+
+# Vercel CLI link (repo root)
+/.vercel
+.vercel

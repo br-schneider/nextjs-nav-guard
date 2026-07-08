@@ -1,4 +1,3 @@
-import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { jsxRenderer } from "hono/jsx-renderer";
@@ -363,11 +362,6 @@ function MyForm() {
       </section>
     </>
   );
-});
-
-const port = Number(process.env.PORT || 3000);
-serve({ fetch: app.fetch, port }, () => {
-  console.log(`Listening on http://localhost:${port}`);
 });
 
 export default app;
