@@ -2,8 +2,67 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { jsxRenderer } from "hono/jsx-renderer";
 import { raw } from "hono/html";
+import docsMarkdown from "./docs.md?raw";
 
 const app = new Hono();
+
+const SITE_URL = "https://nextjs-nav-guard.vercel.app";
+const REPO_URL = "https://github.com/br-schneider/nextjs-nav-guard";
+const LAST_UPDATED = "2026-07-22";
+
+const LINK_HEADER = [
+  `<${SITE_URL}/>; rel="alternate"; type="text/markdown"`,
+  `<${REPO_URL}>; rel="describedby"`,
+  `<${REPO_URL}/blob/main/LICENSE>; rel="license"`,
+].join(", ");
+
+const ROBOTS_TXT = `User-agent: *
+Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: ${SITE_URL}/sitemap.xml
+`;
+
+const SITEMAP_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${SITE_URL}/</loc>
+    <lastmod>${LAST_UPDATED}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+`;
+
+const wantsMarkdown = (accept: string | undefined) =>
+  (accept ?? "").toLowerCase().includes("text/markdown");
 
 app.use("/favicon.svg", serveStatic({ root: "./public" }));
 app.use("/styles.css", serveStatic({ root: "./public" }));
@@ -72,14 +131,33 @@ app.get("*", jsxRenderer(({ children }) => {
         </main>
 
         <footer class="max-w-3xl mx-auto px-6 py-10 mt-8 text-center text-xs text-gray-600">
-          <p>MIT License — Originally created by <a href="https://github.com/LayerXcom" target="_blank" class="text-gray-500 hover:text-gray-300 transition-colors">LayerX Inc.</a></p>
+          <p>MIT license. Originally created by <a href="https://github.com/LayerXcom" target="_blank" class="text-gray-500 hover:text-gray-300 transition-colors">LayerX Inc.</a></p>
         </footer>
       </body>
     </html>
   );
 }));
 
+app.get("/robots.txt", (c) =>
+  c.text(ROBOTS_TXT, 200, { "content-type": "text/plain; charset=utf-8" })
+);
+
+app.get("/sitemap.xml", (c) =>
+  c.body(SITEMAP_XML, 200, { "content-type": "application/xml; charset=utf-8" })
+);
+
 app.get("/", (c) => {
+  if (wantsMarkdown(c.req.header("accept"))) {
+    return c.body(docsMarkdown, 200, {
+      "content-type": "text/markdown; charset=utf-8",
+      link: LINK_HEADER,
+      vary: "Accept",
+    });
+  }
+
+  c.header("link", LINK_HEADER);
+  c.header("vary", "Accept");
+
   return c.render(
     <>
       {/* Hero */}
@@ -132,7 +210,7 @@ app.get("/", (c) => {
 
       {/* Usage */}
       <section id="usage" class="py-10 md:py-14">
-        <h2 class="text-sm text-gray-300 mb-4">Quick Start</h2>
+        <h2 class="text-sm text-gray-300 mb-4">Quick start</h2>
         <p class="text-gray-500 mb-3">1. Wrap your app with the provider in your root layout:</p>
         <pre><code class="language-tsx">{`// app/layout.tsx
 import { NavigationGuardProvider } from "nextjs-nav-guard";
@@ -165,7 +243,7 @@ function MyForm() {
 
       {/* Custom Dialog */}
       <section id="custom-dialog" class="py-10 md:py-14">
-        <h2 class="text-sm text-gray-300 mb-4">Custom Dialog UI</h2>
+        <h2 class="text-sm text-gray-300 mb-4">Custom dialog UI</h2>
         <p class="text-gray-500 mb-3">
           Omit the <code>confirm</code> callback to use async mode. The hook returns <code>active</code>, <code>accept</code>,
           and <code>reject</code> so you can render your own confirmation dialog:
@@ -194,7 +272,7 @@ function MyForm() {
 
       {/* Conditional */}
       <section id="conditional" class="py-10 md:py-14">
-        <h2 class="text-sm text-gray-300 mb-4">Conditional Guard</h2>
+        <h2 class="text-sm text-gray-300 mb-4">Conditional guard</h2>
         <p class="text-gray-500 mb-3">
           The <code>enabled</code> option accepts a function that receives the navigation type,
           so you can guard selectively:
@@ -210,7 +288,7 @@ function MyForm() {
 
       {/* API Reference */}
       <section id="api" class="py-10 md:py-14">
-        <h2 class="text-sm text-gray-300 mb-4">API Reference</h2>
+        <h2 class="text-sm text-gray-300 mb-4">API reference</h2>
 
         <h3 class="text-sm text-gray-300 mt-8 mb-2"><code>&lt;NavigationGuardProvider&gt;</code></h3>
         <p class="text-gray-500 mb-3">
@@ -255,7 +333,7 @@ function MyForm() {
           </table>
         </div>
 
-        <h4 class="text-xs text-gray-400 mt-6 mb-2">Return Value</h4>
+        <h4 class="text-xs text-gray-400 mt-6 mb-2">Return value</h4>
         <div class="overflow-x-auto">
           <table class="w-full text-xs text-left">
             <thead>
@@ -285,7 +363,7 @@ function MyForm() {
           </table>
         </div>
 
-        <h4 class="text-xs text-gray-400 mt-6 mb-2">Navigation Params</h4>
+        <h4 class="text-xs text-gray-400 mt-6 mb-2">Navigation params</h4>
         <p class="text-gray-500 mb-3">Both <code>enabled</code> (when a function) and <code>confirm</code> receive:</p>
         <div class="overflow-x-auto">
           <table class="w-full text-xs text-left">
@@ -311,7 +389,7 @@ function MyForm() {
           </table>
         </div>
 
-        <h4 class="text-xs text-gray-400 mt-6 mb-2">Type Exports</h4>
+        <h4 class="text-xs text-gray-400 mt-6 mb-2">Type exports</h4>
         <pre><code class="language-typescript">{`import type {
   NavigationGuard,         // (params: NavigationGuardParams) => boolean | Promise<boolean>
   NavigationGuardOptions,  // { enabled?, confirm?, disableForTesting? }
@@ -343,7 +421,7 @@ function MyForm() {
                 <td class="py-2.5">Supported</td>
               </tr>
               <tr class="border-b border-white/[0.04]">
-                <td class="py-2.5 pr-4">16.0 &ndash; 16.2+</td>
+                <td class="py-2.5 pr-4">16.0 to 16.2+</td>
                 <td class="py-2.5 pr-4">19</td>
                 <td class="py-2.5">Supported</td>
               </tr>
@@ -358,7 +436,7 @@ function MyForm() {
         <p class="text-gray-500 mb-3">The API is identical. Just change the import:</p>
         <pre><code class="language-diff">{`- import { NavigationGuardProvider, useNavigationGuard } from "next-navigation-guard";
 + import { NavigationGuardProvider, useNavigationGuard } from "nextjs-nav-guard";`}</code></pre>
-        <p class="text-gray-500 mt-4">If you were using Pages Router, you'll need to switch to App Router &mdash; Pages Router support has been removed.</p>
+        <p class="text-gray-500 mt-4">If you were using Pages Router, you'll need to switch to App Router. Pages Router support has been removed.</p>
       </section>
     </>
   );
