@@ -101,7 +101,7 @@ export function useInterceptLinkClicks({
         return;
       }
 
-      // We have guards to check — prevent default immediately for async handling
+      // We have guards to check, so prevent default immediately for async handling
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();

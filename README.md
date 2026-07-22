@@ -6,12 +6,12 @@ This is a maintained fork of [`next-navigation-guard`](https://github.com/LayerX
 
 ## What's different from the original?
 
-- **Next.js 16.2+ support** — fixed runtime crash caused by `null` `history.state` in newer Next.js versions
-- **Resilient internals** — fragile `next/dist/*` imports centralized behind try/catch fallbacks so the library won't crash if Next.js moves internal APIs
-- **Fixed React hooks violation** — conditional `useContext` call that violated rules of hooks
-- **Pages Router removed** — focused on App Router only (Pages Router is deprecated)
-- **Better error messages** — actionable errors when the provider is missing, with code examples
-- **Actively maintained** — compatible with Next.js 14, 15, and 16 (including 16.2+)
+- **Next.js 16.2+ support:** fixed a runtime crash caused by `null` `history.state` in newer Next.js versions
+- **Resilient internals:** fragile `next/dist/*` imports are centralized behind try/catch fallbacks, so the library won't crash if Next.js moves internal APIs
+- **Fixed React hooks violation:** removed a conditional `useContext` call that broke the rules of hooks
+- **Pages Router removed:** focused on App Router only (Pages Router is deprecated)
+- **Better error messages:** actionable errors when the provider is missing, with code examples
+- **Actively maintained:** compatible with Next.js 14, 15, and 16 (including 16.2+)
 
 ## Install
 
@@ -104,10 +104,10 @@ useNavigationGuard({
 
 Wrap your app with this provider. It intercepts navigation at multiple levels:
 
-- **Router methods** — `router.push()`, `router.replace()`, `router.refresh()`
-- **Link clicks** — `<Link>` and `<a>` tag clicks
-- **Browser navigation** — back/forward buttons, `history.go()`
-- **Page unload** — tab close, `window.location` changes
+- **Router methods:** `router.push()`, `router.replace()`, `router.refresh()`
+- **Link clicks:** `<Link>` and `<a>` tag clicks
+- **Browser navigation:** back and forward buttons, `history.go()`
+- **Page unload:** tab close, `window.location` changes
 
 ### `useNavigationGuard(options)`
 
@@ -159,7 +159,7 @@ The API is identical. Just change the import:
 + import { NavigationGuardProvider, useNavigationGuard } from "nextjs-nav-guard";
 ```
 
-If you were using Pages Router, you'll need to switch to App Router — Pages Router support has been removed.
+If you were using Pages Router, you'll need to switch to App Router. Pages Router support has been removed.
 
 ## Compatibility
 
@@ -171,4 +171,4 @@ If you were using Pages Router, you'll need to switch to App Router — Pages Ro
 
 ## License
 
-MIT - Originally created by [LayerX Inc.](https://github.com/LayerXcom)
+MIT license. Originally created by [LayerX Inc.](https://github.com/LayerXcom)

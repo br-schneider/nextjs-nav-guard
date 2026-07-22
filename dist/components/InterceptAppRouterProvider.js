@@ -14,7 +14,7 @@ function InterceptAppRouterProvider({ guardMapRef, children, }) {
             console.warn("[next-nav-guard] Could not access Next.js router context. " +
                 "Router interception (push/replace) will not work. " +
                 "Link click and browser navigation guards still function. " +
-                "This may happen if your Next.js version changed internal APIs — please update next-nav-guard.");
+                "This may happen if your Next.js version changed internal APIs. Please update nextjs-nav-guard.");
         }
         return (0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: children });
     }

@@ -11,8 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix `isSetup` ref blocking link interceptor re-initialization when App Router
   context transitions from null to non-null
-- Fix `refresh()` passing full URL (`location.href`) as the `to` parameter —
-  now uses `location.pathname + location.search` for consistency with push/replace
+- Fix `refresh()` passing full URL (`location.href`) as the `to` parameter, now
+  using `location.pathname + location.search` for consistency with push/replace
 - Fix `"types"` condition order in package.json exports (must be first per TypeScript docs)
 - Remove incorrect `"module"` field pointing to CJS output
 
@@ -24,8 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix accepted link clicks causing full page reload instead of client-side navigation —
-  now uses App Router ref instead of `window.next?.router` (Pages Router artifact)
+- Fix accepted link clicks causing a full page reload instead of client-side navigation,
+  now using the App Router ref instead of `window.next?.router` (Pages Router artifact)
 - Add `appRouter` to effect dependency array so link interceptor re-initializes
   if router context changes after hydration
 - Skip non-HTTP protocol links (`mailto:`, `tel:`, `blob:`, etc.) in link interceptor
@@ -57,16 +57,16 @@ and published as `nextjs-nav-guard`.
 
 ### Fixed
 
-- **Next.js 16.2 runtime crash** — added null guards on all `window.history.state` accesses
+- **Next.js 16.2 runtime crash:** added null guards on all `window.history.state` accesses
   in history augmentation, fixing `TypeError: Cannot read properties of null`
-- **React rules-of-hooks violation** — fixed conditional `useContext` call in link click interceptor
+- **React rules-of-hooks violation:** fixed conditional `useContext` call in link click interceptor
 - Removed dead code: unused `MutationObserver`, vestigial `needsInterceptor` ref,
   orphaned `_guardIntercepted` mutation
 - Warn-once pattern for missing context warning (no console spam)
 
 ### Removed
 
-- **Pages Router support** — removed `InterceptPagesRouterProvider`, `useInterceptedPagesRouter`,
+- **Pages Router support:** removed `InterceptPagesRouterProvider`, `useInterceptedPagesRouter`,
   and all Pages Router code paths. App Router only.
 - Self-referential dependency in package.json
 

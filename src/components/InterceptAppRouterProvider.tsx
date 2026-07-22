@@ -23,7 +23,7 @@ export function InterceptAppRouterProvider({
         "[next-nav-guard] Could not access Next.js router context. " +
           "Router interception (push/replace) will not work. " +
           "Link click and browser navigation guards still function. " +
-          "This may happen if your Next.js version changed internal APIs — please update next-nav-guard."
+          "This may happen if your Next.js version changed internal APIs. Please update nextjs-nav-guard."
       );
     }
     return <>{children}</>;
