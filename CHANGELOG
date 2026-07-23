@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2026-07-23
+
+Security and dependency hygiene. These changes are in devDependencies and the
+docs site; the published package (`dist/`, no runtime dependencies) is unchanged.
+
+### Security
+
+- Fix all pnpm audit advisories (15 to 0): bump `next` to 16.2.11 and `hono`
+  to 4.12.27, override `sharp` to 0.35.0 and `brace-expansion` to 2.1.2
+- Move the website to `@hono/node-server` 2.x, which patches the `serve-static`
+  path traversal. 2.x dropped the `/vercel` subpath, so the Vercel adapter now
+  builds its handler from `getRequestListener` (what 1.x's `handle` did internally)
+
+## [1.0.7] - 2026-07-22
+
+### Fixed
+
+- Fix the dev warning logged when the App Router context is unavailable
+
+### Changed
+
+- Documentation site is now agent-ready (serves Markdown via content
+  negotiation, plus `robots.txt` and `sitemap.xml`)
+- Remove em dashes from the docs and README
+
+## [1.0.6] - 2026-07-07
+
+### Changed
+
+- Point the package homepage at the Vercel docs site
+- Serve the documentation site as a Vercel function instead of static files
+
+## [1.0.5] - 2026-06-18
+
+### Added
+
+- Documentation website
+
+### Changed
+
+- Replace the Tailwind CDN with build-time CSS, update npm metadata
+- Add Next.js 16.2 to CI
+
+### Security
+
+- Fix all pnpm audit advisories (61 to 0)
+
 ## [1.0.3] - 2026-03-18
 
 ### Fixed
