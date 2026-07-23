@@ -1,6 +1,6 @@
 {
   "name": "nextjs-nav-guard",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Prevent accidental navigation away from unsaved changes in Next.js App Router.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -36,7 +36,7 @@
   "homepage": "https://nextjs-nav-guard.vercel.app",
   "repository": {
     "type": "git",
-    "url": "https://github.com/br-schneider/nextjs-nav-guard.git"
+    "url": "git+https://github.com/br-schneider/nextjs-nav-guard.git"
   },
   "bugs": {
     "url": "https://github.com/br-schneider/nextjs-nav-guard/issues"
