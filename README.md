@@ -161,13 +161,31 @@ The API is identical. Just change the import:
 
 If you were using Pages Router, you'll need to switch to App Router. Pages Router support has been removed.
 
+## Limitations
+
+### Reloads and tab closes use the browser dialog
+
+Custom dialog UIs only work for client-side navigations. When the browser fires `beforeunload` (page reload, tab close, leaving for another site), browsers do not allow async work or custom UI. The library can only request the browser's built-in confirmation dialog, and its text and appearance cannot be customized.
+
+### Direct History API calls are not guarded
+
+Calls made directly through `window.history.pushState()` or `window.history.replaceState()` bypass the guard. If you call either method yourself, confirm the navigation before calling it.
+
+### Guarded link clicks are handled programmatically
+
+To intercept `<Link>` and `<a>` clicks, the provider registers a capture-phase click handler. While a guard is enabled, that handler prevents the original click and stops its propagation while the confirmation is pending, then navigates via the App Router if accepted. Code that relies on that click's normal propagation may need to account for this.
+
+### Next.js 16.2 drops query-only replacements after an async guard
+
+Next.js 16.2 has an App Router regression: after an async guard is accepted, a `router.replace()` that changes only the query string may be dropped. This is a Next.js bug, fixed in Next.js 16.3.0, and the library cannot safely work around it. If your app uses this pattern, stay on 16.1.x or upgrade to Next.js 16.3.0 or later.
+
 ## Compatibility
 
 | Next.js | React | Status |
 |---|---|---|
 | 14.x | 18, 19 | Supported |
 | 15.x | 18, 19 | Supported |
-| 16.0 - 16.2+ | 19 | Supported |
+| 16.x | 19 | Supported (16.2 has a known Next.js router bug, see [Limitations](#limitations)) |
 
 ## License
 

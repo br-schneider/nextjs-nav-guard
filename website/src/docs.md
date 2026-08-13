@@ -123,11 +123,18 @@ Navigation params passed to `enabled` and `confirm`:
 - `to` (`string`): the target URL.
 - `type` (`"push" | "replace" | "refresh" | "popstate" | "beforeunload"`): how the navigation was triggered.
 
+## Limitations
+
+- Reloads and tab closes use the browser dialog: custom dialog UIs only work for client-side navigations. When the browser fires `beforeunload` (page reload, tab close, leaving for another site), browsers do not allow async work or custom UI, so the library can only request the built-in confirmation dialog. Its text and appearance cannot be customized.
+- Direct History API calls are not guarded: `window.history.pushState()` and `window.history.replaceState()` bypass the guard. If you call either method yourself, confirm the navigation before calling it.
+- Guarded link clicks are handled programmatically: a capture-phase click handler prevents the original click and stops its propagation while the confirmation is pending, then navigates via the App Router if accepted. Code that relies on that click's normal propagation may need to account for this.
+- Next.js 16.2 drops query-only replacements after an async guard: after an async guard is accepted, a `router.replace()` that changes only the query string may be dropped. This is a Next.js App Router regression, fixed in Next.js 16.3.0. Stay on 16.1.x or upgrade to 16.3.0 or later if you use this pattern.
+
 ## Compatibility
 
 - Next.js 14.x with React 18 or 19: supported
 - Next.js 15.x with React 18 or 19: supported
-- Next.js 16.0 to 16.2+ with React 19: supported
+- Next.js 16.x with React 19: supported. Next.js 16.2 itself has a router bug affecting query-only replacements, see Limitations.
 
 ## Migrating from next-navigation-guard
 

@@ -8,7 +8,7 @@ const app = new Hono();
 
 const SITE_URL = "https://nextjs-nav-guard.vercel.app";
 const REPO_URL = "https://github.com/br-schneider/nextjs-nav-guard";
-const LAST_UPDATED = "2026-07-22";
+const LAST_UPDATED = "2026-08-13";
 
 const LINK_HEADER = [
   `<${SITE_URL}/>; rel="alternate"; type="text/markdown"`,
@@ -397,6 +397,38 @@ function MyForm() {
 } from "nextjs-nav-guard";`}</code></pre>
       </section>
 
+      <section id="limitations" class="py-10 md:py-14">
+        <h2 class="text-sm text-gray-300 mb-4">Limitations</h2>
+
+        <h3 class="text-sm text-gray-300 mt-8 mb-2">Reloads and tab closes use the browser dialog</h3>
+        <p class="text-gray-500 mb-3">
+          Custom dialog UIs only work for client-side navigations. When the browser fires <code>beforeunload</code> (page
+          reload, tab close, leaving for another site), browsers do not allow async work or custom UI. The library can only
+          request the browser's built-in confirmation dialog, and its text and appearance cannot be customized.
+        </p>
+
+        <h3 class="text-sm text-gray-300 mt-8 mb-2">Direct History API calls are not guarded</h3>
+        <p class="text-gray-500 mb-3">
+          Calls made directly through <code>window.history.pushState()</code> or <code>window.history.replaceState()</code> bypass
+          the guard. If you call either method yourself, confirm the navigation before calling it.
+        </p>
+
+        <h3 class="text-sm text-gray-300 mt-8 mb-2">Guarded link clicks are handled programmatically</h3>
+        <p class="text-gray-500 mb-3">
+          To intercept <code>&lt;Link&gt;</code> and <code>&lt;a&gt;</code> clicks, the provider registers a capture-phase click
+          handler. While a guard is enabled, that handler prevents the original click and stops its propagation while the
+          confirmation is pending, then navigates via the App Router if accepted. Code that relies on that click's normal
+          propagation may need to account for this.
+        </p>
+
+        <h3 class="text-sm text-gray-300 mt-8 mb-2">Next.js 16.2 drops query-only replacements after an async guard</h3>
+        <p class="text-gray-500 mb-3">
+          Next.js 16.2 has an App Router regression: after an async guard is accepted, a <code>router.replace()</code> that
+          changes only the query string may be dropped. This is a Next.js bug, fixed in Next.js 16.3.0, and the library cannot
+          safely work around it. If your app uses this pattern, stay on 16.1.x or upgrade to Next.js 16.3.0 or later.
+        </p>
+      </section>
+
       {/* Compatibility */}
       <section id="compatibility" class="py-10 md:py-14">
         <h2 class="text-sm text-gray-300 mb-4">Compatibility</h2>
@@ -421,9 +453,9 @@ function MyForm() {
                 <td class="py-2.5">Supported</td>
               </tr>
               <tr class="border-b border-white/[0.04]">
-                <td class="py-2.5 pr-4">16.0 to 16.2+</td>
+                <td class="py-2.5 pr-4">16.x</td>
                 <td class="py-2.5 pr-4">19</td>
-                <td class="py-2.5">Supported</td>
+                <td class="py-2.5">Supported. 16.2 has a known Next.js router bug, see <a href="#limitations" class="text-gray-300 hover:text-white transition-colors">limitations</a>.</td>
               </tr>
             </tbody>
           </table>
