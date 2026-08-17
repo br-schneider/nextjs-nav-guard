@@ -8,7 +8,61 @@ const app = new Hono();
 
 const SITE_URL = "https://nextjs-nav-guard.vercel.app";
 const REPO_URL = "https://github.com/br-schneider/nextjs-nav-guard";
-const LAST_UPDATED = "2026-08-13";
+const NPM_URL = "https://www.npmjs.com/package/nextjs-nav-guard";
+const FIRST_PUBLISH_DATE = "2026-03-18";
+const LAST_UPDATED = "2026-08-17";
+
+type NpmStats = { version: string | null; downloads: number | null };
+
+const STATS_TTL_MS = 6 * 60 * 60 * 1000;
+const STATS_RETRY_MS = 5 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const RANGE_CHUNK_MS = 500 * DAY_MS;
+
+let statsCache: { stats: NpmStats; expires: number } | null = null;
+
+const fetchJson = async (url: string) => {
+  const res = await fetch(url, { signal: AbortSignal.timeout(2500) });
+  if (!res.ok) throw new Error(`${url} responded ${res.status}`);
+  return res.json();
+};
+
+const fetchLatestVersion = async (): Promise<string> => {
+  const body = await fetchJson(
+    "https://registry.npmjs.org/nextjs-nav-guard/latest"
+  );
+  return String(body.version);
+};
+
+const fetchTotalDownloads = async (): Promise<number> => {
+  let total = 0;
+  let start = new Date(`${FIRST_PUBLISH_DATE}T00:00:00Z`).getTime();
+  const today = Date.now();
+  while (start <= today) {
+    const end = Math.min(start + RANGE_CHUNK_MS, today);
+    const from = new Date(start).toISOString().slice(0, 10);
+    const to = new Date(end).toISOString().slice(0, 10);
+    const body = await fetchJson(
+      `https://api.npmjs.org/downloads/point/${from}:${to}/nextjs-nav-guard`
+    );
+    total += Number(body.downloads) || 0;
+    start = end + DAY_MS;
+  }
+  return total;
+};
+
+const getNpmStats = async (): Promise<NpmStats> => {
+  if (statsCache && Date.now() < statsCache.expires) return statsCache.stats;
+  const [version, downloads] = await Promise.all([
+    fetchLatestVersion().catch(() => null),
+    fetchTotalDownloads().catch(() => null),
+  ]);
+  const stats = { version, downloads };
+  const ttl =
+    version === null || downloads === null ? STATS_RETRY_MS : STATS_TTL_MS;
+  statsCache = { stats, expires: Date.now() + ttl };
+  return stats;
+};
 
 const LINK_HEADER = [
   `<${SITE_URL}/>; rel="alternate"; type="text/markdown"`,
@@ -108,6 +162,7 @@ app.get("*", jsxRenderer(({ children }) => {
               <a href="#install" class="text-xs text-gray-500 hover:text-gray-300 transition-colors">install</a>
               <a href="#usage" class="text-xs text-gray-500 hover:text-gray-300 transition-colors">usage</a>
               <a href="#api" class="text-xs text-gray-500 hover:text-gray-300 transition-colors">api</a>
+              <a href={NPM_URL} target="_blank" class="text-xs text-gray-500 hover:text-gray-300 transition-colors">npm</a>
               <a href="https://github.com/br-schneider/nextjs-nav-guard" target="_blank" class="text-xs text-gray-500 hover:text-gray-300 transition-colors">github</a>
             </div>
             <button id="menu-btn" class="md:hidden p-1 text-gray-500 hover:text-gray-300" aria-label="Toggle menu">
@@ -121,6 +176,7 @@ app.get("*", jsxRenderer(({ children }) => {
               <a href="#install" class="block py-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors">install</a>
               <a href="#usage" class="block py-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors">usage</a>
               <a href="#api" class="block py-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors">api</a>
+              <a href={NPM_URL} target="_blank" class="block py-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors">npm</a>
               <a href="https://github.com/br-schneider/nextjs-nav-guard" target="_blank" class="block py-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors">github</a>
             </div>
           </div>
@@ -146,7 +202,7 @@ app.get("/sitemap.xml", (c) =>
   c.body(SITEMAP_XML, 200, { "content-type": "application/xml; charset=utf-8" })
 );
 
-app.get("/", (c) => {
+app.get("/", async (c) => {
   if (wantsMarkdown(c.req.header("accept"))) {
     return c.body(docsMarkdown, 200, {
       "content-type": "text/markdown; charset=utf-8",
@@ -154,6 +210,8 @@ app.get("/", (c) => {
       vary: "Accept",
     });
   }
+
+  const stats = await getNpmStats();
 
   c.header("link", LINK_HEADER);
   c.header("vary", "Accept");
@@ -169,12 +227,28 @@ app.get("/", (c) => {
           Prevent accidental navigation away from unsaved changes in Next.js App Router.
           Zero config. Two lines of code.
         </p>
-        <div class="mt-5 flex gap-2 flex-wrap">
-          <img alt="npm version" src="https://img.shields.io/npm/v/nextjs-nav-guard" class="h-5" />
-          <img alt="license" src="https://img.shields.io/npm/l/nextjs-nav-guard" class="h-5" />
+        <div class="mt-5 flex items-center gap-2 flex-wrap text-xs text-gray-500">
+          {stats.version && (
+            <>
+              <a href={NPM_URL} target="_blank" class="hover:text-gray-300 transition-colors">
+                v{stats.version}
+              </a>
+              <span class="text-gray-700">·</span>
+            </>
+          )}
+          {stats.downloads != null && (
+            <>
+              <a href={NPM_URL} target="_blank" class="hover:text-gray-300 transition-colors">
+                {stats.downloads.toLocaleString("en-US")} downloads
+              </a>
+              <span class="text-gray-700">·</span>
+            </>
+          )}
+          <span>MIT license</span>
         </div>
         <div class="mt-6 flex gap-4 text-xs">
           <a href="#install" class="text-gray-300 hover:text-white transition-colors">[get started]</a>
+          <a href={NPM_URL} target="_blank" class="text-gray-500 hover:text-gray-300 transition-colors">[npm]</a>
           <a href="https://github.com/br-schneider/nextjs-nav-guard" target="_blank" class="text-gray-500 hover:text-gray-300 transition-colors">[github]</a>
         </div>
       </section>
