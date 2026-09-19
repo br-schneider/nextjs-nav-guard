@@ -219,6 +219,12 @@ If you were using Pages Router, you'll need to switch to App Router. Pages Route
 
 Custom dialog UIs only work for client-side navigations. When the browser fires `beforeunload` (page reload, tab close, leaving for another site), browsers do not allow async work or custom UI. The library can only request the browser's built-in confirmation dialog, and its text and appearance cannot be customized.
 
+### Safari external-navigation limitation
+
+In verification on Safari 27.0 and Playwright WebKit 26.5, cross-site navigation could leave a dirty page without firing `beforeunload`. The same behavior reproduced on a plain HTML page without React, Next.js, or this library. A tab-close prompt worked, and cancelling it preserved the unsaved text. These are separate browser behaviors.
+
+Do not treat unload protection as guaranteed protection for external links or address-bar navigation in Safari. Save drafts independently when losing work would be costly. The library cannot cancel a browser event that never fires.
+
 ### Direct History API calls are not guarded
 
 Calls made directly through `window.history.pushState()` or `window.history.replaceState()` bypass the guard. If you call either method yourself, confirm the navigation before calling it.

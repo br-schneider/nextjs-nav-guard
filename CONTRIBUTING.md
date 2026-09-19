@@ -35,7 +35,7 @@ pnpm build
 pnpm exec playwright test e2e/navigation-concurrency.spec.ts --project=chromium
 ```
 
-CI builds production examples across Next.js 14.0 through 16.3. Next.js 14 uses React 18; Next.js 15 and 16 use React 19. Each row runs Chromium, Firefox, and WebKit. One existing WebKit test skips scripted page-unload prompts because that browser suppresses them under automation.
+CI builds production examples across Next.js 14.0 through 16.3. Next.js 14 uses React 18; Next.js 15 and 16 use React 19. Each row runs Chromium, Firefox, and WebKit. Tab-close acceptance and cancellation run on every engine without a skip. The external-navigation test runs on WebKit as an expected failure for the reproduced browser limitation; an unexpected pass fails CI so the expectation gets revisited.
 
 ## Report a bug
 
@@ -68,3 +68,9 @@ The [roadmap](ROADMAP.md) lists useful starting points. Ask about larger changes
 ## Release process
 
 Release from a commit with passing compatibility and packaging checks. Update the version and changelog, inspect `pnpm pack`, then publish the reviewed package. Create a GitHub release with the corresponding tag and contributor credits. Publishing is a maintainer action, not an automatic side effect of merging a pull request.
+
+## Native Safari verification
+
+Tested with Safari 27.0 on macOS on September 19, 2026. In the form demo, entering text and pressing Command-W opened Safari's native confirmation. Choosing Stay on Page preserved the page and text. In a separate dirty-tab attempt, choosing Leave Page closed the tab. Cross-site navigation could leave without a prompt, including from the independent `example/public/unload-control.html` reproduction. Playwright WebKit 26.5 reproduced that behavior with user activation present and without dispatching `beforeunload`.
+
+To recheck, start the example and open `/` in Safari. Enter text, close the tab, cancel, and verify the text remains. Interact with the form again before checking another prompt because browsers can consume activation. Check external navigation separately. Open `/unload-control.html` to compare against a plain browser listener without the library. Do not turn a missing prompt into a claim that a navigation path is protected.

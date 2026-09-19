@@ -594,6 +594,13 @@ export default function SettingsLink() {
           request the browser's built-in confirmation dialog, and its text and appearance cannot be customized.
         </p>
 
+        <h3 class="text-sm text-gray-300 mt-8 mb-2">Safari can bypass external-navigation prompts</h3>
+        <p class="text-gray-400 mb-4 leading-relaxed">
+          Safari 27.0 and Playwright WebKit 26.5 allowed cross-site navigation without firing beforeunload in our checks,
+          including on a plain HTML page without this library. Tab-close confirmation passed separately.
+          Save drafts independently when losing work would be costly; unload protection is not guaranteed for external links or address-bar navigation.
+        </p>
+
         <h3 class="text-sm text-gray-300 mt-8 mb-2">Direct History API calls are not guarded</h3>
         <p class="text-gray-400 mb-3">
           Calls made directly through <code>window.history.pushState()</code> or <code>window.history.replaceState()</code> bypass

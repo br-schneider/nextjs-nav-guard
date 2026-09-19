@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+<title>Native unload control</title>
+<label>Your note <textarea></textarea></label>
+<a href="https://nextjs-nav-guard.vercel.app/">Documentation</a>
+<script>
+window.addEventListener("beforeunload", (event) => {
+  event.preventDefault();
+  event.returnValue = "Unsaved changes";
+});
+</script>
+</html>
