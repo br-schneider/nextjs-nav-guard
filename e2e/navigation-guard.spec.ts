@@ -266,50 +266,28 @@ test.describe("Navigation Guard - App Router", () => {
     ).toBeChecked();
   });
 
-  test("should guard tab close/navigation away", async ({
-    page,
-    browserName,
-  }) => {
-    // WebKit 26+ no longer surfaces the beforeunload prompt for scripted,
-    // non-user-gesture navigations under automation (page.goto / location.href),
-    // so this synthetic check can't run there. Real tab-close/address-bar
-    // beforeunload guarding still works, and the in-app guard is covered by the
-    // other tests on all engines, including WebKit.
-    test.skip(
-      browserName === "webkit",
-      "WebKit suppresses beforeunload for scripted navigation under automation"
-    );
+  test("closing a dirty tab can be cancelled, then confirmed", async ({ page }) => {
+    await page.goto("/");
+    await page.getByLabel("Your note").click();
+    await page.getByLabel("Your note").fill("Keep this unsaved note");
 
-    await page.goto("/page1");
+    const firstPrompt = page.waitForEvent("dialog", { timeout: 5000 });
+    await page.close({ runBeforeUnload: true });
+    const cancelled = await firstPrompt;
+    expect(cancelled.type()).toBe("beforeunload");
+    await cancelled.dismiss();
 
-    await page
-      .getByRole("checkbox", { name: "Enable Navigation Guard" })
-      .check();
+    expect(page.isClosed()).toBe(false);
+    await expect(page.getByLabel("Your note")).toHaveValue("Keep this unsaved note");
+    await page.getByLabel("Your note").click();
 
-    const dialogPromise = waitForBeforeUnloadDialog(page, "dismiss");
-
-    const navigationPromise = page
-      .goto("https://example.com", { waitUntil: "commit" })
-      .catch(() => {
-        // Navigation will be cancelled
-      });
-
-    await dialogPromise;
-
-    await page.waitForTimeout(500);
-
-    await expect(page.locator("text=Current Page: 1")).toBeVisible();
-    await expect(page).toHaveURL("/page1");
-
-    const dialogPromise2 = waitForBeforeUnloadDialog(page, "dismiss");
-    await page.evaluate(() => {
-      window.location.href = "https://example.com";
-    });
-    await dialogPromise2;
-
-    await page.waitForTimeout(500);
-    await expect(page.locator("text=Current Page: 1")).toBeVisible();
-    await expect(page).toHaveURL("/page1");
+    const secondPrompt = page.waitForEvent("dialog", { timeout: 5000 });
+    await page.close({ runBeforeUnload: true });
+    const accepted = await secondPrompt;
+    expect(accepted.type()).toBe("beforeunload");
+    const closed = page.waitForEvent("close");
+    await accepted.accept();
+    await closed;
   });
 
   test("should allow navigation when guard accepts all navigation types", async ({

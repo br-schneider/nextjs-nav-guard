@@ -1,0 +1,66 @@
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.repository == 'br-schneider/nextjs-nav-guard' && !github.event.release.prerelease
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+      - name: Check release version
+        run: node scripts/validate-release.mjs
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+      - name: Require a commit on main
+        run: git merge-base --is-ancestor HEAD origin/main
+      - name: Record release commit
+        id: commit
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  verify:
+    needs: validate
+    uses: ./.github/workflows/e2e-tests.yml
+    with:
+      checkout-ref: ${{ needs.validate.outputs.commit }}
+
+  publish:
+    needs: [validate, verify]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+        with:
+          ref: ${{ needs.validate.outputs.commit }}
+          persist-credentials: false
+      - run: corepack enable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm install --global npm@11
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: git diff --exit-code -- dist
+      - name: Publish with npm trusted publishing
+        run: npm publish --access public

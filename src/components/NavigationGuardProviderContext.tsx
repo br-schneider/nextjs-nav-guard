@@ -1,7 +1,9 @@
 "use client";
 
 import { createContext, type MutableRefObject } from "react";
-import { GuardDef } from "../types";
+import { AppRouterLike, GuardDef } from "../types";
+
+export const OriginalAppRouterContext = createContext<AppRouterLike | null>(null);
 
 export const NavigationGuardProviderContext = createContext<
   MutableRefObject<Map<string, GuardDef>> | undefined

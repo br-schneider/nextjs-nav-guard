@@ -8,7 +8,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 2 : undefined,
-  reporter: [["html", { open: "never" }]],
+  reporter: [
+    ["html", { open: "never" }],
+    ["json", { outputFile: "playwright-report/results.json" }],
+  ],
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: "on-first-retry",
@@ -29,11 +32,12 @@ export default defineConfig({
     },
   ],
 
-  webServer: process.env.CI
-    ? undefined
-    : {
-        command: `cd example && PORT=${PORT} pnpm dev`,
+  webServer: {
+        command: process.env.PLAYWRIGHT_PRODUCTION
+          ? `pnpm --dir example start --port ${PORT}`
+          : `pnpm --dir example dev --port ${PORT}`,
         port: Number(PORT),
         reuseExistingServer: false,
+        timeout: 120000,
       },
 });

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0c0c0c"/>
+  <rect x="60" y="60" width="1080" height="510" fill="none" stroke="#303030"/>
+  <g font-family="monospace">
+    <text x="100" y="155" fill="#9ca3af" font-size="22">Next.js App Router / MIT license</text>
+    <text x="100" y="285" fill="#e5e7eb" font-size="64">nextjs-nav-guard</text>
+    <text x="100" y="360" fill="#9ca3af" font-size="30">Protect unsaved changes.</text>
+    <text x="100" y="475" fill="#d1d5db" font-size="24">npm install nextjs-nav-guard</text>
+  </g>
+</svg>

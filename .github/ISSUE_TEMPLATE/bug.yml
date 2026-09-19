@@ -1,0 +1,47 @@
+name: Bug report
+description: Report an unexpected navigation or confirmation behavior.
+body:
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions and browser
+      description: Include nextjs-nav-guard, Next.js, React, the browser, and its version.
+    validations:
+      required: true
+  - type: dropdown
+    id: navigation
+    attributes:
+      label: Navigation action
+      options:
+        - Link click
+        - router.push or router.replace
+        - router.refresh
+        - Back, Forward, or history.go
+        - Reload, close, or leaving the site
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: confirmation
+    attributes:
+      label: Confirmation mode
+      options:
+        - window.confirm
+        - Custom dialog with active, accept, and reject
+        - Async confirm callback
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Link a minimal repository or list the steps. Include where the provider mounts and whether loading or session checks delay it. Remove private data.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Include whether the URL and visible page agree after cancellation.
+    validations:
+      required: true

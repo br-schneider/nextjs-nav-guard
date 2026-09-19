@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.1.0] - 2026-09-19
+
+### Fixed
+
+- Block repeated and overlapping navigation attempts until the first confirmation settles
+- Cancel pending confirmations on guard unmount or explicit disabling
+- Restore browser history before replaying accepted Back/Forward navigation
+- Block navigation consistently when confirmation callbacks throw or reject
+- Correct the development warning when Next.js router context is unavailable
+- Remove page-unload listeners for explicitly disabled guards while preserving dynamic predicates
+
+### Added
+
+- Automatic npm publishing after a GitHub release passes the full compatibility and packaging checks
+- Real tab-close acceptance and cancellation coverage on every browser, replacing the WebKit skip
+- An executed expected-failure check and plain HTML reproduction for Safari cross-site unload behavior
+- `NavigationGuardLink` for replacement history, scroll options, and navigation callbacks
+- Browser regression coverage for concurrency, multiple guards, cleanup, and error handling
+- Production compatibility CI with matching React versions and a combined required check
+- Complete form demo with an accessible dialog and a save-before-navigation recipe
+- Contribution guide, issue forms, roadmap, and security reporting instructions
+
+### Changed
+
+- Clarify provider mounting requirements, with thanks to Bruno Papista for the community report
+- Update the upstream comparison and Pages Router support statement
+- Make maintainer and contribution links visible in the documentation
+- Build the library before packing to prevent stale distribution files
+
 ## [1.0.9] - 2026-08-13
 
 Documentation-only release; the shipped code is identical to 1.0.8.

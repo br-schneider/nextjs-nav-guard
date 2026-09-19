@@ -1,0 +1,17 @@
+name: Feature request
+description: Describe an integration or behavior the package should support.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the application behavior and where the current API falls short.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior and alternatives
+      description: A small example helps. Include any workaround you currently use.
+    validations:
+      required: true

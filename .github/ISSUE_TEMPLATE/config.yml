@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and integration help
+    url: https://github.com/br-schneider/nextjs-nav-guard/discussions
+    about: Ask a question or share how you use the package.
+  - name: Security report
+    url: https://github.com/br-schneider/nextjs-nav-guard/blob/main/SECURITY.md
+    about: Report a suspected vulnerability privately.

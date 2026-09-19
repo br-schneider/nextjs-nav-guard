@@ -32,6 +32,7 @@ export function SharedPage({
         <div>
           <NavigationGuardToggle confirm="You have unsaved changes that will be lost." />
         </div>
+        <Link href="/playground">Guard playground</Link>
         <div style={{ display: "flex", gap: 8 }}>
           <span>
             <RefreshButton />
