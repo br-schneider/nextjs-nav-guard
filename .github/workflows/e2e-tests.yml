@@ -108,6 +108,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm audit
       - run: node --test scripts/validate-release.test.mjs
       - run: pnpm build
       - run: git diff --exit-code -- dist

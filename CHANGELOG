@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Update Next.js, Hono, and affected transitive dependencies to resolve all ten dependency audit findings
+- Require a dependency audit in CI and before automated npm publishing
+
 ## [1.1.0] - 2026-09-19
 
 ### Fixed
