@@ -67,7 +67,21 @@ The [roadmap](ROADMAP.md) lists useful starting points. Ask about larger changes
 
 ## Release process
 
-Release from a commit with passing compatibility and packaging checks. Update the version and changelog, inspect `pnpm pack`, then publish the reviewed package. Create a GitHub release with the corresponding tag and contributor credits. Publishing is a maintainer action, not an automatic side effect of merging a pull request.
+Update `package.json` and the changelog in a pull request, then merge after compatibility and packaging checks pass. Create and publish a GitHub release with a matching tag, such as `v1.1.0` for version `1.1.0`, pointing to that commit on `main`. Include contributor credits in the release notes.
+
+After npm publishing succeeds, remove the corresponding unreleased notices from the README and website documentation.
+
+The `publish.yml` workflow validates the tag, reruns the full production browser matrix and packaging checks, and publishes to npm using trusted publishing. Merging a pull request alone does not publish. Draft releases and prereleases do not publish. If publishing fails, fix the cause and rerun the failed jobs from GitHub Actions.
+
+Before the first automated release, configure a GitHub Actions trusted publisher in the npm package settings:
+
+- Organization or user: `br-schneider`
+- Repository: `nextjs-nav-guard`
+- Workflow filename: `publish.yml`
+- Environment: leave blank
+- Allow direct publishing with `npm publish`
+
+No npm token or GitHub secret is needed. npm requires account authentication for this one-time setup. See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
 
 ## Native Safari verification
 

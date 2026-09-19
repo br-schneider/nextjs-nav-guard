@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      checkout-ref:
+        type: string
+        required: true
   schedule:
     - cron: "0 10 * * 1"
 
@@ -49,6 +54,8 @@ jobs:
             react-version: "18"
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          ref: ${{ inputs.checkout-ref || github.sha }}
 
       - run: corepack enable
 
@@ -93,12 +100,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+        with:
+          ref: ${{ inputs.checkout-ref || github.sha }}
       - run: corepack enable
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: node --test scripts/validate-release.test.mjs
       - run: pnpm build
       - run: git diff --exit-code -- dist
       - run: pnpm check:packaging
