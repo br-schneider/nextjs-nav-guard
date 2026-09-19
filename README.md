@@ -2,7 +2,7 @@
 
 Navigation guard for Next.js App Router. Prevent users from accidentally leaving pages with unsaved changes.
 
-**Unreleased:** The navigation concurrency fixes and `NavigationGuardLink` documented here are available in the repository but are not included in npm version `1.0.9`. See the [changelog](CHANGELOG) for release status.
+**Version note:** The navigation concurrency fixes and `NavigationGuardLink` documented here require version `1.1.0` or later. They are not included in `1.0.9`. See the [changelog](CHANGELOG) for release details.
 
 Maintained by [Brett Schneider](https://github.com/br-schneider), based on [`next-navigation-guard`](https://github.com/LayerXcom/next-navigation-guard) by [LayerX](https://github.com/LayerXcom). This fork focuses on App Router compatibility, predictable confirmation behavior, and browser regression tests.
 

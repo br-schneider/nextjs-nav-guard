@@ -574,7 +574,7 @@ export default function NoteForm() {
 
       <section id="guarded-links" class="py-10 md:py-14">
         <h2 class="text-sm text-gray-300 mb-4">Links with options and callbacks</h2>
-        <p class="mb-4"><strong>Unreleased:</strong> This component and the navigation concurrency fixes below are available in the repository, but are not included in npm version 1.0.9. See the <a href={`${REPO_URL}/blob/main/CHANGELOG`}>changelog</a> for release status.</p>
+        <p class="mb-4"><strong>Version note:</strong> This component and the navigation concurrency fixes below require version 1.1.0 or later. They are not included in 1.0.9. See the <a href={`${REPO_URL}/blob/main/CHANGELOG`}>changelog</a> for release details.</p>
         <p class="mb-4">Use <code>NavigationGuardLink</code> to preserve replacement history, scroll control, and click or navigation callbacks. Existing guards work with this component.</p>
         <pre><code class="language-tsx">{`import { NavigationGuardLink } from "nextjs-nav-guard";
 

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-19
+
 ### Fixed
 
 - Block repeated and overlapping navigation attempts until the first confirmation settles
@@ -21,7 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic npm publishing after a GitHub release passes the full compatibility and packaging checks
 - Real tab-close acceptance and cancellation coverage on every browser, replacing the WebKit skip
 - An executed expected-failure check and plain HTML reproduction for Safari cross-site unload behavior
-
 - `NavigationGuardLink` for replacement history, scroll options, and navigation callbacks
 - Browser regression coverage for concurrency, multiple guards, cleanup, and error handling
 - Production compatibility CI with matching React versions and a combined required check
