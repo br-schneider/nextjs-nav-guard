@@ -1,6 +1,7 @@
 import { MutableRefObject, useContext, useMemo } from "react";
 import { AppRouterLike, GuardDef } from "../types";
 import { debug } from "../utils/debug";
+import { confirmNavigation, hasEnabledGuards } from "../utils/confirmNavigation";
 import {
   AppRouterContext,
   FallbackRouterContext,
@@ -28,17 +29,11 @@ export function useInterceptedAppRouter({
       accepted: () => void
     ) => {
       debug(`Navigation attempt: ${type} to ${to}`);
-      const defs = [...guardMapRef.current.values()];
-      for (const { enabled, callback } of defs) {
-        if (!enabled({ to, type })) continue;
-
-        debug(`Calling guard callback for ${type} to ${to}`);
-        const confirm = await callback({ to, type });
-        debug(`Guard callback returned: ${confirm}`);
-        if (!confirm) {
-          debug(`Navigation blocked`);
-          return;
-        }
+      const params = { to, type };
+      if (hasEnabledGuards(guardMapRef.current, params) &&
+          !(await confirmNavigation(guardMapRef.current, params))) {
+        debug(`Navigation blocked`);
+        return;
       }
       debug(`All guards passed, proceeding with navigation`);
       accepted();

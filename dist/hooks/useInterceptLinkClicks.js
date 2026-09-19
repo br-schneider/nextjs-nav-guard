@@ -4,6 +4,7 @@ exports.useInterceptLinkClicks = useInterceptLinkClicks;
 const useIsomorphicLayoutEffect_1 = require("./useIsomorphicLayoutEffect");
 const react_1 = require("react");
 const debug_1 = require("../utils/debug");
+const confirmNavigation_1 = require("../utils/confirmNavigation");
 const nextInternals_1 = require("../utils/nextInternals");
 function useInterceptLinkClicks({ guardMapRef, }) {
     const isSetup = (0, react_1.useRef)(false);
@@ -34,8 +35,7 @@ function useInterceptLinkClicks({ guardMapRef, }) {
             const link = target.closest("a[href]");
             if (!link)
                 return;
-            // Skip if already being processed
-            if (link.dataset.guardProcessing === "true")
+            if (link.dataset.navigationGuard === "managed")
                 return;
             const href = link.getAttribute("href");
             if (!href)
@@ -64,15 +64,20 @@ function useInterceptLinkClicks({ guardMapRef, }) {
             // Check if it's a middle click (open in new tab)
             if (e.button !== 0)
                 return;
+            // Skip if already being processed
+            if (link.dataset.guardProcessing === "true") {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                return;
+            }
             (0, debug_1.debug)(`Intercepted link click to: ${href}`);
             // Mark as processing to prevent double-handling
             link.dataset.guardProcessing = "true";
             // Get navigation type (default to push)
             const navigateType = link.dataset.replace === "true" ? "replace" : "push";
             // Check guards
-            const defs = [...guardMapRef.current.values()];
-            const enabledGuards = defs.filter(({ enabled }) => enabled({ to: href, type: navigateType }));
-            if (enabledGuards.length === 0) {
+            const params = { to: href, type: navigateType };
+            if (!(0, confirmNavigation_1.hasEnabledGuards)(guardMapRef.current, params)) {
                 delete link.dataset.guardProcessing;
                 (0, debug_1.debug)("No guards enabled, allowing navigation");
                 return;
@@ -81,23 +86,7 @@ function useInterceptLinkClicks({ guardMapRef, }) {
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
-            let shouldNavigate = true;
-            for (const { callback } of enabledGuards) {
-                (0, debug_1.debug)(`Calling guard callback for ${navigateType} to ${href}`);
-                try {
-                    const result = await callback({ to: href, type: navigateType });
-                    (0, debug_1.debug)(`Guard callback returned: ${result}`);
-                    if (!result) {
-                        shouldNavigate = false;
-                        break;
-                    }
-                }
-                catch (error) {
-                    (0, debug_1.debug)("Guard callback error:", error);
-                    shouldNavigate = false;
-                    break;
-                }
-            }
+            const shouldNavigate = await (0, confirmNavigation_1.confirmNavigation)(guardMapRef.current, params);
             delete link.dataset.guardProcessing;
             if (shouldNavigate) {
                 (0, debug_1.debug)("All guards passed, navigating programmatically");

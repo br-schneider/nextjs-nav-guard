@@ -5,12 +5,23 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 10 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compatibility-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         next-version:
           [
@@ -28,7 +39,14 @@ jobs:
             "16.2",
             "16.3",
           ]
-        node-version: [20]
+        node-version: [22]
+        include:
+          - next-version: "14.0"
+            react-version: "18"
+          - next-version: "14.1"
+            react-version: "18"
+          - next-version: "14.2"
+            react-version: "18"
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
 
@@ -47,25 +65,18 @@ jobs:
         run: pnpm build
 
       - name: Update Next.js version in example
-        run: pnpm add next@~${{ matrix.next-version }} --save-exact
+        run: pnpm add next@~${{ matrix.next-version }} react@${{ matrix.react-version || '19' }} react-dom@${{ matrix.react-version || '19' }} --save-exact
         working-directory: example
 
       - name: Build example app
         run: pnpm build
         working-directory: example
 
-      - name: Run example app
-        run: pnpm start &
-        working-directory: example
-
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps --only-shell
 
-      - name: Wait for server ready
-        run: curl --fail --retry 10 --retry-delay 1 --retry-all-errors --silent --output /dev/null --head http://localhost:3000
-
       - name: Run Playwright tests
-        run: PORT=3000 pnpm playwright test
+        run: PLAYWRIGHT_PRODUCTION=1 pnpm exec playwright test
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: ${{ !cancelled() }}
@@ -73,3 +84,28 @@ jobs:
           name: playwright-report-next-${{ matrix.next-version }}
           path: playwright-report/
           retention-days: 30
+
+  packaging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+      - run: corepack enable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: git diff --exit-code -- dist
+      - run: pnpm check:packaging
+      - run: pnpm --dir website build
+
+  compatibility:
+    if: always()
+    needs: [test, packaging]
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "$TEST_RESULT" = success && test "$PACKAGE_RESULT" = success
+        env:
+          TEST_RESULT: ${{ needs.test.result }}
+          PACKAGE_RESULT: ${{ needs.packaging.result }}

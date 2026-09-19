@@ -1,9 +1,10 @@
 "use client";
 
-import { type MutableRefObject, type ReactNode } from "react";
+import { type MutableRefObject, type ReactNode, useContext } from "react";
 import { useInterceptedAppRouter } from "../hooks/useInterceptedAppRouter";
 import { GuardDef } from "../types";
-import { AppRouterContext } from "../utils/nextInternals";
+import { AppRouterContext, FallbackRouterContext } from "../utils/nextInternals";
+import { OriginalAppRouterContext } from "./NavigationGuardProviderContext";
 
 let warnedMissingContext = false;
 
@@ -15,6 +16,7 @@ export function InterceptAppRouterProvider({
   children: ReactNode;
 }) {
   const interceptedRouter = useInterceptedAppRouter({ guardMapRef });
+  const originalRouter = useContext(AppRouterContext ?? FallbackRouterContext);
 
   if (!AppRouterContext) {
     if (process.env.NODE_ENV === "development" && !warnedMissingContext) {
@@ -22,7 +24,7 @@ export function InterceptAppRouterProvider({
       console.warn(
         "[next-nav-guard] Could not access Next.js router context. " +
           "Router interception (push/replace) will not work. " +
-          "Link click and browser navigation guards still function. " +
+          "Link click interception is also unavailable. Browser history and page unload guards remain installed. " +
           "This may happen if your Next.js version changed internal APIs. Please update nextjs-nav-guard."
       );
     }
@@ -34,8 +36,10 @@ export function InterceptAppRouterProvider({
   }
 
   return (
+    <OriginalAppRouterContext.Provider value={originalRouter}>
     <AppRouterContext.Provider value={interceptedRouter}>
       {children}
     </AppRouterContext.Provider>
+    </OriginalAppRouterContext.Provider>
   );
 }

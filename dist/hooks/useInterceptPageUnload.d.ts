@@ -1,5 +1,3 @@
-import { GuardDef } from "../types";
-export declare function useInterceptPageUnload({ guardMapRef, }: {
-    guardMapRef: React.MutableRefObject<Map<string, GuardDef>>;
-}): void;
+import { NavigationGuardOptions } from "../types";
+export declare function useInterceptPageUnload(options: NavigationGuardOptions): void;
 //# sourceMappingURL=useInterceptPageUnload.d.ts.map

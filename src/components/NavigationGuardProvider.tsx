@@ -1,7 +1,6 @@
 "use client";
 
 import { type ReactNode, useRef } from "react";
-import { useInterceptPageUnload } from "../hooks/useInterceptPageUnload";
 import { useInterceptPopState } from "../hooks/useInterceptPopState";
 import { useInterceptLinkClicks } from "../hooks/useInterceptLinkClicks";
 import { GuardDef } from "../types";
@@ -16,7 +15,6 @@ export function NavigationGuardProvider({
   const guardMapRef = useRef(new Map<string, GuardDef>());
 
   useInterceptPopState({ guardMapRef });
-  useInterceptPageUnload({ guardMapRef });
   useInterceptLinkClicks({ guardMapRef });
 
   return (

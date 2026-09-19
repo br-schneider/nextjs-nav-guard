@@ -29,11 +29,12 @@ export default defineConfig({
     },
   ],
 
-  webServer: process.env.CI
-    ? undefined
-    : {
-        command: `cd example && PORT=${PORT} pnpm dev`,
+  webServer: {
+        command: process.env.PLAYWRIGHT_PRODUCTION
+          ? `pnpm --dir example start --port ${PORT}`
+          : `pnpm --dir example dev --port ${PORT}`,
         port: Number(PORT),
         reuseExistingServer: false,
+        timeout: 120000,
       },
 });

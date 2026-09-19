@@ -2,6 +2,7 @@ import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 import { MutableRefObject, useContext, useRef } from "react";
 import { AppRouterLike, GuardDef } from "../types";
 import { debug } from "../utils/debug";
+import { confirmNavigation, hasEnabledGuards } from "../utils/confirmNavigation";
 import {
   AppRouterContext,
   FallbackRouterContext,
@@ -46,9 +47,7 @@ export function useInterceptLinkClicks({
       const link = target.closest("a[href]") as HTMLAnchorElement;
 
       if (!link) return;
-
-      // Skip if already being processed
-      if (link.dataset.guardProcessing === "true") return;
+      if (link.dataset.navigationGuard === "managed") return;
 
       const href = link.getAttribute("href");
       if (!href) return;
@@ -80,6 +79,13 @@ export function useInterceptLinkClicks({
       // Check if it's a middle click (open in new tab)
       if (e.button !== 0) return;
 
+      // Skip if already being processed
+      if (link.dataset.guardProcessing === "true") {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
+
       debug(`Intercepted link click to: ${href}`);
 
       // Mark as processing to prevent double-handling
@@ -90,12 +96,9 @@ export function useInterceptLinkClicks({
         link.dataset.replace === "true" ? "replace" : "push";
 
       // Check guards
-      const defs = [...guardMapRef.current.values()];
-      const enabledGuards = defs.filter(({ enabled }) =>
-        enabled({ to: href, type: navigateType })
-      );
+      const params = { to: href, type: navigateType } as const;
 
-      if (enabledGuards.length === 0) {
+      if (!hasEnabledGuards(guardMapRef.current, params)) {
         delete link.dataset.guardProcessing;
         debug("No guards enabled, allowing navigation");
         return;
@@ -106,25 +109,7 @@ export function useInterceptLinkClicks({
       e.stopPropagation();
       e.stopImmediatePropagation();
 
-      let shouldNavigate = true;
-
-      for (const { callback } of enabledGuards) {
-        debug(`Calling guard callback for ${navigateType} to ${href}`);
-
-        try {
-          const result = await callback({ to: href, type: navigateType });
-          debug(`Guard callback returned: ${result}`);
-
-          if (!result) {
-            shouldNavigate = false;
-            break;
-          }
-        } catch (error) {
-          debug("Guard callback error:", error);
-          shouldNavigate = false;
-          break;
-        }
-      }
+      const shouldNavigate = await confirmNavigation(guardMapRef.current, params);
 
       delete link.dataset.guardProcessing;
 

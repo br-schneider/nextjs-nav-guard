@@ -35,6 +35,24 @@ a {
   text-decoration: none;
 }
 
+.demo {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  line-height: 1.6;
+}
+
+.demo a { text-decoration: underline; text-underline-offset: 4px; }
+.demo textarea { width: 100%; padding: 16px; font: inherit; border-radius: 8px; }
+.demo-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.demo button, dialog button { padding: 10px 16px; font: inherit; cursor: pointer; border-radius: 6px; }
+dialog { margin: auto; max-width: min(440px, calc(100vw - 32px)); padding: 28px; border-radius: 12px; }
+dialog p { margin: 16px 0; }
+dialog::backdrop { background: rgb(0 0 0 / 65%); }
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

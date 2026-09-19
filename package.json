@@ -17,9 +17,12 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p .",
+    "typecheck": "tsc --noEmit",
+    "prepack": "pnpm build",
     "watch": "tsc --watch -p .",
     "check:packaging": "pnpm dlx @arethetypeswrong/cli --pack .",
-    "e2e": "playwright test",
+    "e2e": "pnpm build && playwright test",
+    "e2e:production": "pnpm build && pnpm --dir example build && PLAYWRIGHT_PRODUCTION=1 playwright test",
     "e2e:ui": "playwright test --ui",
     "e2e:install": "playwright install"
   },

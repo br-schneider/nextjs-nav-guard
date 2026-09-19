@@ -1,5 +1,6 @@
 import { GuardDef, RenderedState } from "../types";
 import { DEBUG } from "../utils/debug";
+import { confirmNavigation, hasEnabledGuards } from "../utils/confirmNavigation";
 import {
   newToken,
   setupHistoryAugmentationOnce,
@@ -43,100 +44,69 @@ function createHandlePopState(
   guardMapRef: React.MutableRefObject<Map<string, GuardDef>>,
   writeState: () => void
 ) {
-  let dispatchedState: unknown;
+  let pending: {
+    targetIndex: number;
+    restored: boolean;
+    accepted?: boolean;
+    replaying: boolean;
+  } | null = null;
+
+  const resume = () => {
+    if (!pending?.restored) return;
+    if (pending.accepted === false) {
+      pending = null;
+    } else if (pending.accepted === true) {
+      pending.replaying = true;
+      window.history.go(pending.targetIndex - renderedStateRef.current.index);
+    }
+  };
 
   return (nextState: any = {}): boolean => {
-    const token: string | undefined =
-      nextState?.__next_navigation_guard_token;
-    const nextIndex: number =
-      Number(nextState?.__next_navigation_guard_stack_index) || 0;
+    const token: string | undefined = nextState?.__next_navigation_guard_token;
+    const nextIndex = Number(nextState?.__next_navigation_guard_stack_index) || 0;
 
     if (!token || token !== renderedStateRef.current.token) {
-      if (DEBUG)
-        console.log(
-          `useInterceptPopState(): token mismatch, skip handling (current: ${renderedStateRef.current.token}, next: ${token})`
-        );
+      pending = null;
       renderedStateRef.current.token = token || newToken();
       renderedStateRef.current.index = token ? nextIndex : 0;
       writeState();
       return true;
     }
 
-    const delta = nextIndex - renderedStateRef.current.index;
-    // When go(-delta) is called, delta should be zero.
-    if (delta === 0) {
-      if (DEBUG)
-        console.log(
-          `useInterceptPopState(): discard popstate event: delta is 0`
-        );
+    if (pending) {
+      if (pending.replaying && nextIndex === pending.targetIndex) {
+        pending = null;
+        renderedStateRef.current.index = nextIndex;
+        return true;
+      }
+      pending.restored = nextIndex === renderedStateRef.current.index;
+      if (pending.restored) resume();
+      else window.history.go(renderedStateRef.current.index - nextIndex);
       return false;
     }
 
-    if (DEBUG)
-      console.log(
-        `useInterceptPopState(): __next_navigation_guard_stack_index is ${nextState.__next_navigation_guard_stack_index}`
-      );
+    const delta = nextIndex - renderedStateRef.current.index;
+    // When go(-delta) is called, delta should be zero.
+    if (delta === 0) return false;
 
-    const to = location.pathname + location.search;
-
-    const defs = [...guardMapRef.current.values()];
-
-    if (nextState === dispatchedState || defs.length === 0) {
-      if (DEBUG)
-        console.log(
-          `useInterceptPopState(): Accept popstate event, index: ${nextIndex}`
-        );
-      dispatchedState = null;
+    const params = { to: location.pathname + location.search + location.hash, type: "popstate" } as const;
+    if (!hasEnabledGuards(guardMapRef.current, params)) {
       renderedStateRef.current.index = nextIndex;
       return true;
     }
 
-    if (DEBUG)
-      console.log(
-        `useInterceptPopState(): Suspend popstate event, index: ${nextIndex}`
-      );
+    const attempt = { targetIndex: nextIndex, restored: false, replaying: false };
+    pending = attempt;
+    window.history.go(-delta);
 
     // Wait for all callbacks to be resolved
-    (async () => {
-      let i = -1;
-
-      for (const def of defs) {
-        i++;
-
-        if (!def.enabled({ to, type: "popstate" })) continue;
-        if (DEBUG) {
-          console.log(
-            `useInterceptPopState(): confirmation for listener index ${i}`
-          );
-        }
-
-        const confirm = await def.callback({ to, type: "popstate" });
-        if (!confirm) {
-          if (DEBUG) {
-            console.log(
-              `useInterceptPopState(): Cancel popstate event, go(): ${
-                renderedStateRef.current.index
-              } - ${nextIndex} = ${-delta}`
-            );
-          }
-          if (delta !== 0) {
-            window.history.go(-delta);
-          }
-          return;
-        }
-      }
-
-      if (DEBUG) {
-        console.log(
-          `useInterceptPopState(): Accept popstate event, ${nextIndex}`
-        );
-      }
+    void confirmNavigation(guardMapRef.current, params).then((accepted) => {
+      if (pending !== attempt) return;
+      pending.accepted = accepted;
+      if (DEBUG) console.log("useInterceptPopState(): confirmation resolved", accepted);
       // accept
-      dispatchedState = nextState;
-      window.dispatchEvent(
-        new PopStateEvent("popstate", { state: nextState })
-      );
-    })();
+      resume();
+    });
 
     // Return false to call stopImmediatePropagation()
     return false;
