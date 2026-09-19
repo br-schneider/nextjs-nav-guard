@@ -1,6 +1,10 @@
 import { useCallback, useContext, useId, useRef, useState } from "react";
 import { NavigationGuardProviderContext } from "../components/NavigationGuardProviderContext";
-import { NavigationGuardCallback, NavigationGuardOptions } from "../types";
+import {
+  NavigationGuardCallback,
+  NavigationGuardOptions,
+  NavigationGuardParams,
+} from "../types";
 import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 import { debug } from "../utils/debug";
 import { useInterceptPageUnload } from "./useInterceptPageUnload";
@@ -17,7 +21,7 @@ export function useNavigationGuard(options: NavigationGuardOptions) {
         '  import { NavigationGuardProvider } from "nextjs-nav-guard";\n\n' +
         "  export default function RootLayout({ children }) {\n" +
         "    return <NavigationGuardProvider>{children}</NavigationGuardProvider>;\n" +
-        "  }"
+        "  }",
     );
 
   const [pendingState, setPendingState] = useState<{
@@ -25,10 +29,19 @@ export function useNavigationGuard(options: NavigationGuardOptions) {
   } | null>(null);
   const optionsRef = useRef(options);
   const resolvePendingRef = useRef<((accepted: boolean) => void) | null>(null);
+  const pendingParamsRef = useRef<NavigationGuardParams | null>(null);
 
   useIsomorphicLayoutEffect(() => {
     optionsRef.current = options;
-    if (options.enabled === false || options.disableForTesting) {
+    let enabled = options.enabled !== false;
+    if (pendingParamsRef.current && typeof options.enabled === "function") {
+      try {
+        enabled = options.enabled(pendingParamsRef.current);
+      } catch {
+        enabled = true;
+      }
+    }
+    if (!enabled || options.disableForTesting) {
       resolvePendingRef.current?.(false);
       setPendingState(null);
     }
@@ -45,10 +58,14 @@ export function useNavigationGuard(options: NavigationGuardOptions) {
         const settle = (accepted: boolean) => {
           if (settled) return;
           settled = true;
-          if (resolvePendingRef.current === settle) resolvePendingRef.current = null;
+          if (resolvePendingRef.current === settle) {
+            resolvePendingRef.current = null;
+            pendingParamsRef.current = null;
+          }
           resolve(accepted);
         };
         resolvePendingRef.current = settle;
+        pendingParamsRef.current = params;
         const confirm = optionsRef.current.confirm;
         if (confirm) {
           debug(`Using sync confirm function`);
@@ -72,7 +89,9 @@ export function useNavigationGuard(options: NavigationGuardOptions) {
     guardMapRef!.current.set(callbackId, {
       enabled: (params) => {
         const enabled = optionsRef.current.enabled;
-        return typeof enabled === "function" ? enabled(params) : enabled ?? true;
+        return typeof enabled === "function"
+          ? enabled(params)
+          : (enabled ?? true);
       },
       callback,
     });

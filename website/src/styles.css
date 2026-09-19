@@ -29,3 +29,6 @@ p code {
   @apply text-[0.85em] px-1.5 py-0.5 bg-white/[0.06] border border-white/[0.08] text-gray-300 font-mono;
   border-radius: 0;
 }
+pre { position: relative; }
+.copy-code { display: block; margin-top: 1rem; padding: 0.3rem 0.6rem; border: 1px solid #6b7280; border-radius: 0.25rem; color: #d1d5db; }
+.copy-code:focus-visible { outline: 2px solid #d1d5db; outline-offset: 3px; }

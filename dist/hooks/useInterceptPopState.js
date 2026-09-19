@@ -67,12 +67,19 @@ function createHandlePopState(guardMapRef, writeState) {
         // When go(-delta) is called, delta should be zero.
         if (delta === 0)
             return false;
-        const params = { to: location.pathname + location.search + location.hash, type: "popstate" };
+        const params = {
+            to: location.pathname + location.search + location.hash,
+            type: "popstate",
+        };
         if (!(0, confirmNavigation_1.hasEnabledGuards)(guardMapRef.current, params)) {
             renderedStateRef.current.index = nextIndex;
             return true;
         }
-        const attempt = { targetIndex: nextIndex, restored: false, replaying: false };
+        const attempt = {
+            targetIndex: nextIndex,
+            restored: false,
+            replaying: false,
+        };
         pending = attempt;
         window.history.go(-delta);
         // Wait for all callbacks to be resolved

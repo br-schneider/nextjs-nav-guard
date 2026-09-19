@@ -11,13 +11,13 @@ function useInterceptPageUnload(options) {
             try {
                 return typeof options.enabled === "function"
                     ? options.enabled({ to: "", type: "beforeunload" })
-                    : (_a = options.enabled) !== null && _a !== void 0 ? _a : true;
+                    : ((_a = options.enabled) !== null && _a !== void 0 ? _a : true);
             }
             catch {
                 return true;
             }
         };
-        if (!isEnabled())
+        if (options.disableForTesting || options.enabled === false)
             return;
         const handleBeforeUnload = (event) => {
             // We does not support confirm() on beforeunload as

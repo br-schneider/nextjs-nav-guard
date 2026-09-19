@@ -21,10 +21,20 @@ function useNavigationGuard(options) {
     const [pendingState, setPendingState] = (0, react_1.useState)(null);
     const optionsRef = (0, react_1.useRef)(options);
     const resolvePendingRef = (0, react_1.useRef)(null);
+    const pendingParamsRef = (0, react_1.useRef)(null);
     (0, useIsomorphicLayoutEffect_1.useIsomorphicLayoutEffect)(() => {
         var _a;
         optionsRef.current = options;
-        if (options.enabled === false || options.disableForTesting) {
+        let enabled = options.enabled !== false;
+        if (pendingParamsRef.current && typeof options.enabled === "function") {
+            try {
+                enabled = options.enabled(pendingParamsRef.current);
+            }
+            catch {
+                enabled = true;
+            }
+        }
+        if (!enabled || options.disableForTesting) {
             (_a = resolvePendingRef.current) === null || _a === void 0 ? void 0 : _a.call(resolvePendingRef, false);
             setPendingState(null);
         }
@@ -42,11 +52,14 @@ function useNavigationGuard(options) {
                     if (settled)
                         return;
                     settled = true;
-                    if (resolvePendingRef.current === settle)
+                    if (resolvePendingRef.current === settle) {
                         resolvePendingRef.current = null;
+                        pendingParamsRef.current = null;
+                    }
                     resolve(accepted);
                 };
                 resolvePendingRef.current = settle;
+                pendingParamsRef.current = params;
                 const confirm = optionsRef.current.confirm;
                 if (confirm) {
                     (0, debug_1.debug)(`Using sync confirm function`);
@@ -70,7 +83,9 @@ function useNavigationGuard(options) {
         guardMapRef.current.set(callbackId, {
             enabled: (params) => {
                 const enabled = optionsRef.current.enabled;
-                return typeof enabled === "function" ? enabled(params) : enabled !== null && enabled !== void 0 ? enabled : true;
+                return typeof enabled === "function"
+                    ? enabled(params)
+                    : (enabled !== null && enabled !== void 0 ? enabled : true);
             },
             callback,
         });

@@ -1,0 +1,35 @@
+# nextjs-nav-guard
+
+> An MIT-licensed TypeScript library that protects unsaved changes in Next.js App Router applications.
+
+## When to use this
+
+Use nextjs-nav-guard when implementing an unsaved-changes warning for a form, editor, or multi-step workflow in the Next.js App Router. It can intercept link clicks, router methods, browser back and forward navigation, and page unloads. Use a confirm callback for a simple prompt, or the hook's active, accept, and reject values for a custom dialog during client-side navigation.
+
+This package is installed in the user's application. It has no hosted API, authentication service, or MCP server. It is not an authorization guard and does not support the Pages Router.
+
+## How to use
+
+1. Read the compatibility and limitations sections in the full documentation for the application's Next.js version.
+2. Install with `npm install nextjs-nav-guard`.
+3. Wrap the application's root layout children with `NavigationGuardProvider` from `nextjs-nav-guard`.
+4. In a client component, call `useNavigationGuard({ enabled: isDirty, confirm: () => window.confirm("Discard unsaved changes?") })`.
+5. Verify that canceling keeps the form and its data intact, accepting completes navigation, and saving disables the guard.
+
+For reloads and tab closes, browsers control the confirmation dialog. Direct `history.pushState()` and `history.replaceState()` calls bypass the guard. Check the full limitations before choosing a navigation pattern.
+
+## Documentation
+
+- [Full documentation](https://nextjs-nav-guard.vercel.app/index.md): Installation, examples, API reference, compatibility, and limitations in Markdown.
+- [API reference](https://nextjs-nav-guard.vercel.app/#api): Provider, hook options, return values, and navigation parameters.
+- [Custom dialog example](https://nextjs-nav-guard.vercel.app/#custom-dialog): Asynchronous client-side confirmation.
+- [Limitations](https://nextjs-nav-guard.vercel.app/#limitations): Browser behavior and version-specific constraints.
+- [Documentation OpenAPI description](https://nextjs-nav-guard.vercel.app/openapi.json): Read-only HTTP access to these text documents. No authentication required.
+
+## Project
+
+- [npm package](https://www.npmjs.com/package/nextjs-nav-guard): Published releases.
+- [Source repository](https://github.com/br-schneider/nextjs-nav-guard): Source code and MIT license.
+- [About](https://nextjs-nav-guard.vercel.app/about): Project history and maintainer.
+- [Contact](https://nextjs-nav-guard.vercel.app/contact): Bug reports and support.
+- [Privacy](https://nextjs-nav-guard.vercel.app/privacy): Website data handling.

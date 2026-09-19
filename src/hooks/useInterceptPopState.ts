@@ -1,6 +1,9 @@
 import { GuardDef, RenderedState } from "../types";
 import { DEBUG } from "../utils/debug";
-import { confirmNavigation, hasEnabledGuards } from "../utils/confirmNavigation";
+import {
+  confirmNavigation,
+  hasEnabledGuards,
+} from "../utils/confirmNavigation";
 import {
   newToken,
   setupHistoryAugmentationOnce,
@@ -42,7 +45,7 @@ export function useInterceptPopState({
 
 function createHandlePopState(
   guardMapRef: React.MutableRefObject<Map<string, GuardDef>>,
-  writeState: () => void
+  writeState: () => void,
 ) {
   let pending: {
     targetIndex: number;
@@ -63,7 +66,8 @@ function createHandlePopState(
 
   return (nextState: any = {}): boolean => {
     const token: string | undefined = nextState?.__next_navigation_guard_token;
-    const nextIndex = Number(nextState?.__next_navigation_guard_stack_index) || 0;
+    const nextIndex =
+      Number(nextState?.__next_navigation_guard_stack_index) || 0;
 
     if (!token || token !== renderedStateRef.current.token) {
       pending = null;
@@ -89,13 +93,20 @@ function createHandlePopState(
     // When go(-delta) is called, delta should be zero.
     if (delta === 0) return false;
 
-    const params = { to: location.pathname + location.search + location.hash, type: "popstate" } as const;
+    const params = {
+      to: location.pathname + location.search + location.hash,
+      type: "popstate",
+    } as const;
     if (!hasEnabledGuards(guardMapRef.current, params)) {
       renderedStateRef.current.index = nextIndex;
       return true;
     }
 
-    const attempt = { targetIndex: nextIndex, restored: false, replaying: false };
+    const attempt = {
+      targetIndex: nextIndex,
+      restored: false,
+      replaying: false,
+    };
     pending = attempt;
     window.history.go(-delta);
 
@@ -103,7 +114,8 @@ function createHandlePopState(
     void confirmNavigation(guardMapRef.current, params).then((accepted) => {
       if (pending !== attempt) return;
       pending.accepted = accepted;
-      if (DEBUG) console.log("useInterceptPopState(): confirmation resolved", accepted);
+      if (DEBUG)
+        console.log("useInterceptPopState(): confirmation resolved", accepted);
       // accept
       resume();
     });

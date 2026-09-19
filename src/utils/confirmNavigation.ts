@@ -5,7 +5,7 @@ const pending = new WeakSet<Map<string, GuardDef>>();
 
 export function hasEnabledGuards(
   guards: Map<string, GuardDef>,
-  params: NavigationGuardParams
+  params: NavigationGuardParams,
 ) {
   if (pending.has(guards)) return true;
   try {
@@ -18,7 +18,7 @@ export function hasEnabledGuards(
 
 export async function confirmNavigation(
   guards: Map<string, GuardDef>,
-  params: NavigationGuardParams
+  params: NavigationGuardParams,
 ): Promise<boolean> {
   if (pending.has(guards)) return false;
   pending.add(guards);
