@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "^16.2.11",
+    "next": "^16.3.5",
     "nextjs-nav-guard": "link:..",
     "react": "^19",
     "react-dom": "^19"

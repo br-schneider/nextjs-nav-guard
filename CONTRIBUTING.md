@@ -22,6 +22,7 @@ Open http://localhost:3000 for the form demo. `/playground` exposes router calls
 ```bash
 pnpm e2e:install
 pnpm typecheck
+pnpm audit
 pnpm e2e
 pnpm e2e:production
 pnpm check:packaging
