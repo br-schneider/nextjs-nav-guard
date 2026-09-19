@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { jsxRenderer } from "hono/jsx-renderer";
 import { raw } from "hono/html";
 import docsMarkdown from "./docs.md?raw";
+import { CodeBlock } from "./CodeBlock";
 import agentInstructions from "./llms.txt?raw";
 import { OPENAPI } from "./openapi";
 import { DESCRIPTION, INFO_PAGES, NPM_URL, REPO_URL, SITE_URL, STRUCTURED_DATA } from "./site";
@@ -152,8 +153,8 @@ app.get("*", jsxRenderer(({ children }, c) => {
         <link rel="service-desc" href="/openapi.json" type="application/vnd.oai.openapi+json" />
         {c.req.path === "/" && <script type="application/ld+json">{raw(JSON.stringify(STRUCTURED_DATA).replace(/</g, "\\u003c"))}</script>}
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" />
         <link rel="stylesheet" href="/styles.css" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark-dimmed.min.css" />
         <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/typescript.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/xml.min.js"></script>
@@ -162,20 +163,27 @@ app.get("*", jsxRenderer(({ children }, c) => {
         {raw(`<script>
           document.addEventListener('DOMContentLoaded', () => {
             if (window.hljs) hljs.highlightAll();
-            document.querySelectorAll('pre').forEach(pre => {
-              const button = document.createElement('button');
-              button.textContent = 'Copy code';
-              button.className = 'copy-code';
-              button.type = 'button';
+            document.querySelectorAll('.code-block').forEach(block => {
+              const button = block.querySelector('.copy-code');
+              const code = block.querySelector('code');
+              const label = button.querySelector('span');
+              let reset;
+              button.disabled = false;
               button.addEventListener('click', async () => {
+                clearTimeout(reset);
                 try {
-                  await navigator.clipboard.writeText(pre.querySelector('code').textContent);
-                  button.textContent = 'Copied';
+                  await navigator.clipboard.writeText(code.textContent);
+                  label.textContent = 'Copied!';
                 } catch {
-                  button.textContent = 'Select code to copy';
+                  const range = document.createRange();
+                  range.selectNodeContents(code);
+                  const selection = window.getSelection();
+                  selection.removeAllRanges();
+                  selection.addRange(range);
+                  label.textContent = 'Selected';
                 }
+                reset = setTimeout(() => { label.textContent = 'Copy'; }, 2000);
               });
-              pre.appendChild(button);
             });
             const btn = document.getElementById('menu-btn');
             const menu = document.getElementById('mobile-menu');
@@ -325,7 +333,7 @@ app.get("/", async (c) => {
       {/* Install */}
       <section id="install" class="py-10 md:py-14">
         <h2 class="text-sm text-gray-300 mb-4">Install</h2>
-        <pre><code class="language-bash">npm install nextjs-nav-guard</code></pre>
+        <CodeBlock language="bash" filename="Terminal">npm install nextjs-nav-guard</CodeBlock>
       </section>
 
       {/* Features */}
@@ -355,7 +363,7 @@ app.get("/", async (c) => {
       <section id="usage" class="py-10 md:py-14">
         <h2 class="text-sm text-gray-300 mb-4">Quick start</h2>
         <p class="text-gray-400 mb-3">1. Mount the provider unconditionally in your root layout:</p>
-        <pre><code class="language-tsx">{`// app/layout.tsx
+        <CodeBlock language="tsx" filename="app/layout.tsx">{`// app/layout.tsx
 import { NavigationGuardProvider } from "nextjs-nav-guard";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -366,10 +374,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </body>
     </html>
   );
-}`}</code></pre>
+}`}</CodeBlock>
 
         <p class="text-gray-400 mt-8 mb-4">2. Use the hook in any component with unsaved changes:</p>
-        <pre><code class="language-tsx">{`"use client";
+        <CodeBlock language="tsx" filename="NameForm.tsx">{`"use client";
 
 import { useState } from "react";
 import { useNavigationGuard } from "nextjs-nav-guard";
@@ -387,7 +395,7 @@ export default function NameForm() {
       <input value={name} onChange={(event) => setName(event.target.value)} />
     </label>
   );
-}`}</code></pre>
+}`}</CodeBlock>
         <p class="text-gray-400 mt-4">Mount the provider unconditionally. Put loading screens and session checks inside it so browser history protection is installed early.</p>
       </section>
 
@@ -398,7 +406,7 @@ export default function NameForm() {
           Omit the <code>confirm</code> callback to use async mode. The hook returns <code>active</code>, <code>accept</code>,
           and <code>reject</code> so you can render your own confirmation dialog:
         </p>
-        <pre><code class="language-tsx">{`"use client";
+        <CodeBlock language="tsx" filename="NoteForm.tsx">{`"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useNavigationGuard } from "nextjs-nav-guard";
@@ -430,7 +438,7 @@ export default function NoteForm() {
       </dialog>
     </>
   );
-}`}</code></pre>
+}`}</CodeBlock>
       </section>
 
       {/* Conditional */}
@@ -440,13 +448,13 @@ export default function NoteForm() {
           The <code>enabled</code> option accepts a function that receives the navigation type,
           so you can guard selectively:
         </p>
-        <pre><code class="language-tsx">{`useNavigationGuard({
+        <CodeBlock language="tsx" filename="Conditional guard">{`useNavigationGuard({
   enabled: ({ type }) => {
     // Only guard against link clicks and back/forward, not refresh
     return type !== "refresh" && type !== "beforeunload";
   },
   confirm: () => window.confirm("Discard changes?"),
-});`}</code></pre>
+});`}</CodeBlock>
       </section>
 
       {/* API Reference */}
@@ -554,11 +562,11 @@ export default function NoteForm() {
         </div>
 
         <h4 class="text-xs text-gray-400 mt-6 mb-2">Type exports</h4>
-        <pre><code class="language-typescript">{`import type {
+        <CodeBlock language="typescript" filename="types.ts">{`import type {
   NavigationGuard,         // (params: NavigationGuardParams) => boolean | Promise<boolean>
   NavigationGuardOptions,  // { enabled?, confirm?, disableForTesting? }
   NavigationGuardParams,   // { to: string; type: "push" | "replace" | ... }
-} from "nextjs-nav-guard";`}</code></pre>
+} from "nextjs-nav-guard";`}</CodeBlock>
       </section>
 
       <section id="community" class="py-10 md:py-14">
@@ -576,11 +584,11 @@ export default function NoteForm() {
         <h2 class="text-sm text-gray-300 mb-4">Links with options and callbacks</h2>
         <p class="mb-4"><strong>Version note:</strong> This component and the navigation concurrency fixes below require version 1.1.0 or later. They are not included in 1.0.9. See the <a href={`${REPO_URL}/blob/main/CHANGELOG`}>changelog</a> for release details.</p>
         <p class="mb-4">Use <code>NavigationGuardLink</code> to preserve replacement history, scroll control, and click or navigation callbacks. Existing guards work with this component.</p>
-        <pre><code class="language-tsx">{`import { NavigationGuardLink } from "nextjs-nav-guard";
+        <CodeBlock language="tsx" filename="SettingsLink.tsx">{`import { NavigationGuardLink } from "nextjs-nav-guard";
 
 export default function SettingsLink() {
   return <NavigationGuardLink href="/settings" replace scroll={false}>Settings</NavigationGuardLink>;
-}`}</code></pre>
+}`}</CodeBlock>
         <p class="mt-4">The first pending navigation owns the confirmation. Further attempts are blocked until it settles. Unmounting or disabling a guard cancels its pending attempt.</p>
         <p class="mt-4">For saving before navigation, see the <a href={`${REPO_URL}/blob/main/example/src/components/FormDemo.tsx`}>complete form demo</a>. Only mark the form clean after saving succeeds.</p>
       </section>
@@ -663,8 +671,8 @@ export default function SettingsLink() {
       <section id="migration" class="py-10 md:py-14">
         <h2 class="text-sm text-gray-300 mb-4">Migrating from next-navigation-guard</h2>
         <p class="text-gray-400 mb-3">The API is identical. Just change the import:</p>
-        <pre><code class="language-diff">{`- import { NavigationGuardProvider, useNavigationGuard } from "next-navigation-guard";
-+ import { NavigationGuardProvider, useNavigationGuard } from "nextjs-nav-guard";`}</code></pre>
+        <CodeBlock language="diff" filename="Update imports">{`- import { NavigationGuardProvider, useNavigationGuard } from "next-navigation-guard";
++ import { NavigationGuardProvider, useNavigationGuard } from "nextjs-nav-guard";`}</CodeBlock>
         <p class="text-gray-400 mt-4">If you were using Pages Router, you'll need to switch to App Router. Pages Router support has been removed.</p>
       </section>
     </>
