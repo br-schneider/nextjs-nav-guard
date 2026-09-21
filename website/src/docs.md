@@ -167,7 +167,7 @@ Only one confirmation runs at a time within a provider. The first attempted dest
 
 Unmounting a guard, setting `enabled: false`, or setting `disableForTesting: true` cancels its pending confirmation. These actions do not automatically perform the cancelled navigation.
 
-In version 1.1.1 (unreleased), adding, removing, or replacing a registered guard while confirmation is pending cancels that attempt when the confirmation finishes. Start a new navigation to evaluate the current guards. Accepted links also preserve a configured Next.js `basePath` without adding it twice.
+Starting with version 1.1.1, adding, removing, or replacing a registered guard while confirmation is pending cancels that attempt when the confirmation finishes. Start a new navigation to evaluate the current guards. Accepted links also preserve a configured Next.js `basePath` without adding it twice.
 
 #### Options
 
@@ -239,7 +239,7 @@ To intercept `<Link>` and `<a>` clicks, the provider registers a capture-phase c
 
 ### Mount the provider before async content
 
-The provider's history listener must register before Next.js handles `popstate`. A provider first mounted after a loading screen or session check may miss Back/Forward navigation even while link guarding works. Keep the provider mounted in the root layout and place conditional content inside it. See the [community report](https://github.com/br-schneider/nextjs-nav-guard/pull/2).
+The provider's history listener must register before Next.js handles `popstate`. A provider first mounted after a loading screen or session check may miss Back/Forward navigation even while link guarding works. Keep the provider mounted in the root layout and place conditional content inside it.
 
 ### Browser limits
 
