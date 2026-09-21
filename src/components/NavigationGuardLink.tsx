@@ -51,7 +51,7 @@ export const NavigationGuardLink = forwardRef<
           return;
         const href = link.getAttribute("href");
         if (!href) return;
-        const url = new URL(href, location.href);
+        const url = new URL(link.href);
         if (url.origin !== location.origin || !/^https?:$/.test(url.protocol))
           return;
         let cancelled = false;
@@ -75,7 +75,7 @@ export const NavigationGuardLink = forwardRef<
         event.preventDefault();
         void confirmNavigation(guards.current, params).then((accepted) => {
           if (accepted && link.isConnected)
-            router[params.type](href, { scroll });
+            router[params.type](url.href, { scroll });
         });
       }}
     />

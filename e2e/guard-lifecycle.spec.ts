@@ -1,5 +1,42 @@
 import { expect, test } from "@playwright/test";
 
+for (const navigation of [
+  "Push destination",
+  "Replace destination",
+  "Destination one",
+  "Replace link",
+  "Back",
+]) {
+  test(`mounting a guard during ${navigation} cancels the pending attempt`, async ({
+    page,
+  }) => {
+    await page.goto("/page1");
+    await page.getByRole("link", { name: "Guard playground" }).click();
+    const role =
+      navigation === "Destination one" || navigation === "Replace link"
+        ? "link"
+        : "button";
+    await page.getByRole(role, { name: navigation, exact: true }).click();
+    await expect(
+      page.getByRole("dialog", { name: "Leave editor?", exact: true }),
+    ).toBeVisible();
+    await page.getByLabel("Multiple guards").check();
+    await page.getByRole("button", { name: "Leave", exact: true }).click();
+    await expect(page.getByRole("dialog")).not.toBeVisible();
+    await expect(page).toHaveURL("/playground");
+    await page.getByRole("button", { name: "Push destination" }).click();
+    await page
+      .getByRole("dialog", { name: "Leave editor?", exact: true })
+      .getByRole("button", { name: "Leave", exact: true })
+      .click();
+    await page
+      .getByRole("dialog", { name: "Leave second editor?", exact: true })
+      .getByRole("button", { name: "Stay", exact: true })
+      .click();
+    await expect(page).toHaveURL("/playground");
+  });
+}
+
 for (const method of ["Push", "Replace"]) {
   test(`${method} waits for confirmation and supports cancellation`, async ({
     page,

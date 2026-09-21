@@ -167,6 +167,8 @@ Only one confirmation runs at a time within a provider. The first attempted dest
 
 Unmounting a guard, setting `enabled: false`, or setting `disableForTesting: true` cancels its pending confirmation. These actions do not automatically perform the cancelled navigation.
 
+In version 1.1.1 (unreleased), adding, removing, or replacing a registered guard while confirmation is pending cancels that attempt when the confirmation finishes. Start a new navigation to evaluate the current guards. Accepted links also preserve a configured Next.js `basePath` without adding it twice.
+
 #### Options
 
 | Option | Type | Default | Description |
