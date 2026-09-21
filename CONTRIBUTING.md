@@ -25,6 +25,7 @@ pnpm typecheck
 pnpm audit
 pnpm e2e
 pnpm e2e:production
+pnpm e2e:base-path
 pnpm check:packaging
 pnpm --dir website build
 ```
@@ -37,6 +38,8 @@ pnpm exec playwright test e2e/navigation-concurrency.spec.ts --project=chromium
 ```
 
 CI builds production examples across Next.js 14.0 through 16.3. Next.js 14 uses React 18; Next.js 15 and 16 use React 19. Each row runs Chromium, Firefox, and WebKit. Tab-close acceptance and cancellation run on every engine without a skip. The external-navigation test runs on WebKit as an expected failure for the reproduced browser limitation; an unexpected pass fails CI so the expectation gets revisited.
+
+Separate production builds test a `/docs` base path on Next.js 14.2, 15.5, and 16.3. Run `pnpm e2e:base-path` locally to check guarded links, replacement history, query strings, and scroll preservation. The base-path suite uses its own build; rebuild the example before switching back to the regular production suite.
 
 ## Report a bug
 

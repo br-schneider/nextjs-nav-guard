@@ -4,6 +4,8 @@ const PORT = process.env.PORT || 30000;
 
 export default defineConfig({
   testDir: "./e2e",
+  testMatch: process.env.PLAYWRIGHT_BASE_PATH ? "base-path.spec.ts" : undefined,
+  testIgnore: process.env.PLAYWRIGHT_BASE_PATH ? undefined : "base-path.spec.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

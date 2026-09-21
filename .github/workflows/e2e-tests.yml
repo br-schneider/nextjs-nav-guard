@@ -25,6 +25,8 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    env:
+      PLAYWRIGHT_BASE_PATH: ${{ matrix.base-path }}
     strategy:
       fail-fast: false
       matrix:
@@ -45,6 +47,7 @@ jobs:
             "16.3",
           ]
         node-version: [22]
+        base-path: [""]
         include:
           - next-version: "14.0"
             react-version: "18"
@@ -52,6 +55,16 @@ jobs:
             react-version: "18"
           - next-version: "14.2"
             react-version: "18"
+          - next-version: "14.2"
+            node-version: 22
+            react-version: "18"
+            base-path: "/docs"
+          - next-version: "15.5"
+            node-version: 22
+            base-path: "/docs"
+          - next-version: "16.3"
+            node-version: 22
+            base-path: "/docs"
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
@@ -92,7 +105,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report-next-${{ matrix.next-version }}
+          name: playwright-report-next-${{ matrix.next-version }}${{ matrix.base-path && '-base-path' || '' }}
           path: playwright-report/
           retention-days: 30
 

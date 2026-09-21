@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.1] - Unreleased
+
+### Fixed
+
+- Preserve base paths when accepting ordinary links and NavigationGuardLink without duplicating the URL prefix
+- Cancel pending navigation if registered guards change before confirmation finishes, so newly mounted editors cannot be skipped
+
+### Added
+
+- Production base-path regression coverage on Next.js 14.2, 15.5, and 16.3 across Chromium, Firefox, and WebKit
+- Guard registration regressions for router calls, link clicks, and Back navigation
 
 ### Security
 

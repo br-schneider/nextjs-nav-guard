@@ -51,6 +51,7 @@ export function useInterceptLinkClicks({
 
       const href = link.getAttribute("href");
       if (!href) return;
+      const navigationHref = link.href;
 
       // Skip external links
       if (
@@ -119,9 +120,9 @@ export function useInterceptLinkClicks({
         const router = appRouterRef.current;
         if (router) {
           if (navigateType === "replace") {
-            router.replace(href);
+            router.replace(navigationHref);
           } else {
-            router.push(href);
+            router.push(navigationHref);
           }
         } else {
           // Fallback to full navigation if router is unavailable

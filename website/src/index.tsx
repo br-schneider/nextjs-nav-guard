@@ -590,6 +590,7 @@ export default function SettingsLink() {
   return <NavigationGuardLink href="/settings" replace scroll={false}>Settings</NavigationGuardLink>;
 }`}</CodeBlock>
         <p class="mt-4">The first pending navigation owns the confirmation. Further attempts are blocked until it settles. Unmounting or disabling a guard cancels its pending attempt.</p>
+        <p class="mt-4">In version 1.1.1 (unreleased), changes to the registered guards cancel the pending attempt when confirmation finishes. Start a new navigation to check the current guards. Accepted links also preserve a configured Next.js <code>basePath</code> without adding it twice.</p>
         <p class="mt-4">For saving before navigation, see the <a href={`${REPO_URL}/blob/main/example/src/components/FormDemo.tsx`}>complete form demo</a>. Only mark the form clean after saving succeeds.</p>
       </section>
 

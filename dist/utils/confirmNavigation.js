@@ -19,16 +19,19 @@ async function confirmNavigation(guards, params) {
     if (pending.has(guards))
         return false;
     pending.add(guards);
+    const registeredGuards = new Map(guards);
+    const registrationsUnchanged = () => guards.size === registeredGuards.size &&
+        [...registeredGuards].every(([id, guard]) => guards.get(id) === guard);
     try {
-        for (const [id, guard] of [...guards]) {
-            if (!guards.has(id))
+        for (const guard of registeredGuards.values()) {
+            if (!registrationsUnchanged())
                 return false;
             if (!guard.enabled(params))
                 continue;
-            if (!(await guard.callback(params)) || !guards.has(id))
+            if (!(await guard.callback(params)) || !registrationsUnchanged())
                 return false;
         }
-        return true;
+        return registrationsUnchanged();
     }
     catch (error) {
         (0, debug_1.debug)("Guard callback error:", error);

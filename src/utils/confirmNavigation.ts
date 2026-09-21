@@ -22,13 +22,18 @@ export async function confirmNavigation(
 ): Promise<boolean> {
   if (pending.has(guards)) return false;
   pending.add(guards);
+  const registeredGuards = new Map(guards);
+  const registrationsUnchanged = () =>
+    guards.size === registeredGuards.size &&
+    [...registeredGuards].every(([id, guard]) => guards.get(id) === guard);
   try {
-    for (const [id, guard] of [...guards]) {
-      if (!guards.has(id)) return false;
+    for (const guard of registeredGuards.values()) {
+      if (!registrationsUnchanged()) return false;
       if (!guard.enabled(params)) continue;
-      if (!(await guard.callback(params)) || !guards.has(id)) return false;
+      if (!(await guard.callback(params)) || !registrationsUnchanged())
+        return false;
     }
-    return true;
+    return registrationsUnchanged();
   } catch (error) {
     debug("Guard callback error:", error);
     return false;
