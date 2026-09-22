@@ -169,6 +169,7 @@ test.describe("Navigation Guard - App Router", () => {
     await page.goto("/page1");
     await page.getByRole("link", { name: "Page2" }).click();
     await expect(page.locator("text=Current Page: 2")).toBeVisible();
+    await expect(page).toHaveURL("/page2");
 
     await page.goBack();
     await expect(page.locator("text=Current Page: 1")).toBeVisible();
@@ -178,7 +179,9 @@ test.describe("Navigation Guard - App Router", () => {
       .getByRole("checkbox", { name: "Enable Navigation Guard" })
       .check();
 
+    const confirmation = page.waitForEvent("dialog");
     page.once("dialog", (dialog) => {
+      expect(dialog.type()).toBe("confirm");
       expect(dialog.message()).toBe(
         "You have unsaved changes that will be lost."
       );
@@ -187,7 +190,7 @@ test.describe("Navigation Guard - App Router", () => {
 
     await page.goForward();
 
-    await page.waitForTimeout(1000);
+    await confirmation;
     await expect(page.locator("text=Current Page: 1")).toBeVisible();
     await expect(page).toHaveURL("/page1");
   });
@@ -219,6 +222,7 @@ test.describe("Navigation Guard - App Router", () => {
     await page.goto("/page1");
     await page.getByRole("link", { name: "Page2" }).click();
     await expect(page.locator("text=Current Page: 2")).toBeVisible();
+    await expect(page).toHaveURL("/page2");
 
     await page.getByRole("button", { name: "router.back()" }).click();
     await expect(page.locator("text=Current Page: 1")).toBeVisible();
@@ -228,7 +232,9 @@ test.describe("Navigation Guard - App Router", () => {
       .getByRole("checkbox", { name: "Enable Navigation Guard" })
       .check();
 
+    const confirmation = page.waitForEvent("dialog");
     page.once("dialog", (dialog) => {
+      expect(dialog.type()).toBe("confirm");
       expect(dialog.message()).toBe(
         "You have unsaved changes that will be lost."
       );
@@ -237,7 +243,7 @@ test.describe("Navigation Guard - App Router", () => {
 
     await page.getByRole("button", { name: "router.forward()" }).click();
 
-    await page.waitForTimeout(1000);
+    await confirmation;
     await expect(page.locator("text=Current Page: 1")).toBeVisible();
     await expect(page).toHaveURL("/page1");
   });
