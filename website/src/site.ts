@@ -67,13 +67,15 @@ export const INFO_PAGES = [
     title: "Privacy on the nextjs-nav-guard documentation site",
     description: "How the documentation site and library handle data and external services.",
     paragraphs: [
-      "This documentation site has no account registration, contact form, or payment flow. Its application code does not set tracking cookies or include an analytics SDK. The nextjs-nav-guard library runs inside the application that installs it. It intercepts browser navigation and calls the callbacks you provide; it does not send your form contents to a nextjs-nav-guard service.",
+      "This documentation site has no account registration, contact form, or payment flow. The nextjs-nav-guard library runs inside the application that installs it. It intercepts browser navigation and calls the callbacks you provide; it does not send your form contents to a nextjs-nav-guard service.",
+      "The documentation site uses Vercel Web Analytics to measure page views and visitor counts without tracking cookies. Analytics can include visited URLs, referring pages, approximate location, and browser and device information. These statistics help the maintainer understand how people use the documentation.",
       "The site is hosted on Vercel. Like other hosting providers, Vercel receives request information when you visit, which can include your IP address, browser information, and requested URL. The site loads syntax-highlighting scripts and styles from jsDelivr, so your browser also makes requests to that service. Those providers control how they handle their own request data.",
       "The documentation server requests the package version and aggregate download counts from npm to display package statistics. Links to GitHub and npm take you to those services, which have their own privacy practices. If you open a GitHub issue, the content you post is public. For questions about this site's behavior, contact the maintainer through the contact page.",
     ],
     links: [
       { label: "Contact the maintainer", href: "/contact" },
       { label: "Inspect the website source", href: `${REPO_URL}/tree/main/website` },
+      { label: "Vercel Web Analytics privacy", href: "https://vercel.com/docs/analytics/privacy-policy" },
     ],
   },
 ];
