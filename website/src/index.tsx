@@ -11,7 +11,7 @@ import { DESCRIPTION, INFO_PAGES, NPM_URL, REPO_URL, SITE_URL, STRUCTURED_DATA }
 const app = new Hono();
 
 const FIRST_PUBLISH_DATE = "2026-03-18";
-const LAST_UPDATED = "2026-09-18";
+const LAST_UPDATED = "2026-09-22";
 
 type NpmStats = { version: string | null; downloads: number | null };
 
@@ -239,6 +239,12 @@ app.get("*", jsxRenderer(({ children }, c) => {
             <a href="/llms.txt" class="text-gray-400 hover:text-gray-300 transition-colors">llms.txt</a>
           </div>
         </footer>
+        {process.env.VERCEL === "1" && (
+          <>
+            <script>{raw("window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };")}</script>
+            <script defer src="/_vercel/insights/script.js"></script>
+          </>
+        )}
       </body>
     </html>
   );
