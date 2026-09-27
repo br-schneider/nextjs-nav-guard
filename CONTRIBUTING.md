@@ -71,9 +71,11 @@ The [roadmap](ROADMAP.md) lists useful starting points. Ask about larger changes
 
 ## Release process
 
-Update `package.json` and the changelog in a pull request, then merge after compatibility and packaging checks pass. Create and publish a GitHub release with a matching tag, such as `v1.1.0` for version `1.1.0`, pointing to that commit on `main`. Include contributor credits in the release notes.
+Prepare the release in one pull request. Update `package.json` and the changelog, remove the release's unreleased notices from the README and website documentation, and check that documentation links point to the intended pages. Use version-specific wording such as "Starting with version 1.1.1" so the docs remain accurate before publishing.
 
-After npm publishing succeeds, remove the corresponding unreleased notices from the README and website documentation.
+Merge after compatibility and packaging checks pass. Create and publish a GitHub release with a matching tag, such as `v1.1.2` for version `1.1.2`, pointing to that commit on `main`. Include contributor credits in the release notes.
+
+The README on npm is a snapshot from the published package. Updating it on GitHub does not update npm's copy; a documentation-only correction there requires a new package version. See [npm's README update instructions](https://docs.npmjs.com/about-package-readme-files/#updating-an-existing-package-readmemd-file). After publishing succeeds, check the README on npm for the corrected wording and links.
 
 The `publish.yml` workflow validates the tag, reruns the full production browser matrix and packaging checks, and publishes to npm using trusted publishing. Merging a pull request alone does not publish. Draft releases and prereleases do not publish. If publishing fails, fix the cause and rerun the failed jobs from GitHub Actions.
 
