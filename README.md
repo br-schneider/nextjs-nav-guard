@@ -8,7 +8,10 @@ Maintained by [Brett Schneider](https://github.com/br-schneider), based on [`nex
 
 [Documentation](https://nextjs-nav-guard.vercel.app/) · [Run the demo](#demo) · [Contribute](CONTRIBUTING.md) · [Roadmap](ROADMAP.md)
 
-[![Compatibility tests](https://github.com/br-schneider/nextjs-nav-guard/actions/workflows/e2e-tests.yml/badge.svg)](https://github.com/br-schneider/nextjs-nav-guard/actions/workflows/e2e-tests.yml)
+[![npm version](https://img.shields.io/npm/v/nextjs-nav-guard)](https://www.npmjs.com/package/nextjs-nav-guard)
+[![Monthly downloads](https://img.shields.io/npm/dm/nextjs-nav-guard)](https://www.npmjs.com/package/nextjs-nav-guard)
+[![Compatibility tests](https://github.com/br-schneider/nextjs-nav-guard/actions/workflows/e2e-tests.yml/badge.svg?branch=main)](https://github.com/br-schneider/nextjs-nav-guard/actions/workflows/e2e-tests.yml)
+[![License](https://img.shields.io/npm/l/nextjs-nav-guard)](LICENSE)
 
 ## What's different from the original?
 
